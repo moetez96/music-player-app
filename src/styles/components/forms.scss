@@ -1,0 +1,24 @@
+.search-bar-wrapper {
+    height: 96px;
+    display: flex;
+    align-items: center;
+    gap: 1%;
+    padding-left: 22px;
+}
+
+input[type] {
+    background-color: transparent;
+    border: none;
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+
+    &:focus {
+        outline: none;
+    }
+
+    &::placeholder {
+        color: #FFFFFF;
+        opacity: 1;
+    }
+}

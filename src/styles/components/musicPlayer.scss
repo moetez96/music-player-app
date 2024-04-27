@@ -71,8 +71,13 @@
     gap: 4px;
 }
 
-@mixin range-track-color {
-    $percentage: calc((100% / 100) * var(--slider-value));
+@mixin range-track-color-volume {
+    $percentage: calc((100% / 100) * var(--slider-value-volume));
+    background: linear-gradient(to right, #FACD66 0%, #FACD66 #{$percentage}, rgba(255, 255, 255, 0.1) #{$percentage}, rgba(255, 255, 255, 0.1) 100%);
+}
+
+@mixin range-track-color-duration {
+    $percentage: calc((100% / 100) * var(--slider-value-duration));
     background: linear-gradient(to right, #FACD66 0%, #FACD66 #{$percentage}, rgba(255, 255, 255, 0.1) #{$percentage}, rgba(255, 255, 255, 0.1) 100%);
 }
 
@@ -86,12 +91,12 @@
 
     &::-webkit-slider-runnable-track {
         height: 4px;
-        @include range-track-color;
+        @include range-track-color-duration;
     }
 
     &::-moz-range-track {
         height: 4px;
-        @include range-track-color;
+        @include range-track-color-duration;
     }
 
     &::-webkit-slider-thumb {
@@ -111,12 +116,7 @@
     &::-moz-range-thumb {
         width: 1.25rem;
         height: 1.25rem;
-        background-color: #fff;
-        border-radius: 50%;
-        border: 3px solid #FACD66;
-        position: relative;
-        z-index: 1;
-        transform: translateY(-40%);
+
     }
 }
 
@@ -129,12 +129,12 @@
     border-radius: 42px;
     &::-webkit-slider-runnable-track {
         height: 3px;
-        @include range-track-color;
+        @include range-track-color-volume;
     }
 
     &::-moz-range-track {
         height: 3px;
-        @include range-track-color;
+        @include range-track-color-volume;
     }
 
     &::-webkit-slider-thumb {

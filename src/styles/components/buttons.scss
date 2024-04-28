@@ -1,0 +1,27 @@
+input[type="file"] {
+    display: none;
+}
+
+.upload-button {
+    display: inline-block;
+    text-align: center;
+    line-height: 36px;
+    width: max-content;
+    height: 36px;
+    font-size: 14px;
+    border-radius: 18px;
+    color: #FFFFFF;
+    background-color: rgba(51, 55, 59, 0.7);
+    padding: 0 20px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  
+    &:hover {
+      background-color: rgba(51, 55, 59, 0.9);
+    }
+  }

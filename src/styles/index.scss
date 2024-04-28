@@ -26,12 +26,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
   max-width: 1920px;
   margin: 20px 50px;
-  height: 100%;
-  overflow-x: hidden;
+  max-height: 100vh;
+  overflow: hidden;
   background-color: #1D2123;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.main-screen-wrapper {
+  height: 100vh;
+  display: flex;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.upload-music-buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 24px;
 }

@@ -21,6 +21,7 @@ function MusicPlayer() {
   }, [value]);
 
   useEffect(() => {
+    document.documentElement.style.setProperty("--slider-value-duration", currentTime);
     const storedFileList = JSON.parse(localStorage.getItem("fileList")) || [];
     setFileList(storedFileList);
   }, []);
@@ -70,8 +71,7 @@ function MusicPlayer() {
   return (
     <div className="player-wrapper">
       <div>
-        <input type="file" accept="audio/mp3" onChange={handleFileChange}           style={{ display: "none" }}
-/>
+        <input type="file" accept="audio/mp3" onChange={handleFileChange} style={{ display: "none" }} />
         <audio
           ref={audioRef}
           controls

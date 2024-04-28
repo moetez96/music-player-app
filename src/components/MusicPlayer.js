@@ -71,7 +71,8 @@ function MusicPlayer() {
   return (
     <div className="player-wrapper">
       <div>
-        <input type="file" accept="audio/mp3" onChange={handleFileChange} style={{ display: "none" }} />
+        <input type="file" accept="audio" onChange={handleFileChange} 
+        />
         <audio
           ref={audioRef}
           controls

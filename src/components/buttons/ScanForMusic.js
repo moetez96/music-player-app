@@ -2,8 +2,7 @@ import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 
 function ScanForMusic() {
     const handleFileChange = (event) => {
-        
-      };
+    };
   return (
     <>
       <input

@@ -6,11 +6,12 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "jsmediatags-web": "^0.0.4",
+    "music-metadata-browser": "^2.5.10",
     "react": "^18.2.0",
     "react-audio-player": "^0.17.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
-    "react-use-audio-player": "^2.2.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

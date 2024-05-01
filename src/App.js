@@ -5,14 +5,14 @@ import Navigation from "./components/layout/Navigation";
 
 function App() {
   return (
-    <div>
+    <>
       <Header/>
       <div className="main-screen-wrapper">
         <Navigation/>
         <MainScreen />
       </div>
       <Footer/>
-    </div>
+    </>
   );
 }
 

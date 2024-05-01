@@ -1,0 +1,31 @@
+.music-card {
+    width: 1125px;
+    height: 56px;
+    border-radius: 66px;
+    background-color: rgb(51, 55, 59, 0.37);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3%;
+    
+    span {
+        width: max-content;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 50px;
+    }
+
+    p {
+        font-size: 14px;
+        color: #FFFFFF;
+    }
+}
+
+.music-card-img {
+    height: 39px;
+    width: 39px;
+    border-radius: 8.53px;
+    overflow: hidden;
+}

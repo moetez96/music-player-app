@@ -1,13 +1,23 @@
 import "../../styles/components/cards.scss";
 import musicPlaceholder from "../../styles/assets/images/music_placeholder.jpg";
 import HeartIcon from "../icons/HeartIcon";
-import OptionIcon from "../icons/OptionIcon";
+import DeleteIcon from "../icons/DeleteIcon";
 
 function MusicCard({ musicItem }) {
-
-    if (!musicItem) {
-    return null; 
+  if (!musicItem) {
+    return null;
   }
+
+  const removeMusic = () => {
+    const listM = JSON.parse(localStorage.getItem("musicList")) || [];
+    const index = listM.findIndex((item) => item.url === musicItem.url);
+
+    if (index !== -1) {
+      listM.splice(index, 1);
+      localStorage.setItem("musicList", JSON.stringify(listM));
+      window.dispatchEvent(new Event("storage"));
+    }
+  };
 
   return (
     <div className="music-card">
@@ -22,19 +32,21 @@ function MusicCard({ musicItem }) {
       <p>{musicItem.title}</p>
       <p>{musicItem.album}</p>
       <p>{formatDuration(musicItem.duration)}</p>
-      <OptionIcon />
+      <span onClick={removeMusic}>
+        <DeleteIcon />
+      </span>
     </div>
   );
 }
 
 function formatDuration(duration) {
-    if (!duration) {
-      return "--:--";
-    }
-  
-    var minutes = Math.floor(duration / 60);
-    var remainingSeconds = Math.floor(duration % 60);    
-    return minutes + ":" + remainingSeconds;
+  if (!duration) {
+    return "--:--";
   }
+
+  var minutes = Math.floor(duration / 60);
+  var remainingSeconds = Math.floor(duration % 60);
+  return minutes + ":" + remainingSeconds;
+}
 
 export default MusicCard;

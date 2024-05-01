@@ -3,7 +3,6 @@ import UploadMusicIcon from "../icons/UploadMusicIcon";
 import jsmediatags from "jsmediatags-web";
 
 function UploadMusic() {
-    
   const handleFileChange = (event) => {
     const file = event.target.files[0];
 
@@ -31,6 +30,8 @@ function UploadMusic() {
             const musicList = JSON.parse(localStorage.getItem("musicList")) || [];
             musicList.push(track);
             localStorage.setItem("musicList", JSON.stringify(musicList));
+
+            window.dispatchEvent(new Event("storage"));
           });
           audio.load();
         },

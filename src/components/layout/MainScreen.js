@@ -7,8 +7,16 @@ function MainScreen() {
   const [musicList, setMusicList] = useState([]);
 
   useEffect(() => {
-    var listM = JSON.parse(localStorage.getItem("musicList")) || [];
-    setMusicList(listM);
+
+    const updateMusicList = () => {
+        const listM = JSON.parse(localStorage.getItem("musicList")) || [];
+        setMusicList(listM);
+      };
+      updateMusicList();
+        window.addEventListener("storage", updateMusicList);
+      return () => {
+        window.removeEventListener("storage", updateMusicList);
+      };
   }, []);
 
   return (

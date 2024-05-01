@@ -8,7 +8,6 @@ function MainScreen() {
 
   useEffect(() => {
     var listM = JSON.parse(localStorage.getItem("musicList")) || [];
-    console.log(listM);
     setMusicList(listM);
   }, []);
 

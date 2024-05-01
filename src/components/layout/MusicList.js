@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import "../../styles/layout/music_list.scss"
 import ScanForMusic from "../buttons/ScanForMusic";
 import UploadMusic from "../buttons/UploadMusic";
@@ -15,7 +14,7 @@ function MusicList({ musicList }) {
             {musicList.length === 0 ? (<></>) : (
                 <>
                     {musicList.map((musicItem, index) => (
-                        <MusicCard key={index} {...musicItem} />
+                        <MusicCard key={index} musicItem={musicItem} />
                     ))}
                 </>
             )}

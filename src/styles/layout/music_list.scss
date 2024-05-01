@@ -1,0 +1,11 @@
+.music-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.upload-music-icons-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}

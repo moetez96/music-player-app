@@ -1,18 +1,31 @@
 import UploadMusic from "../buttons/UploadMusic";
 import ScanForMusic from "../buttons/ScanForMusic";
 import MusicList from "./MusicList";
+import { useEffect, useState } from "react";
 
 function MainScreen() {
+  const [musicList, setMusicList] = useState([]);
 
-    return (
+  useEffect(() => {
+    var listM = JSON.parse(localStorage.getItem("musicList")) || [];
+    console.log(listM);
+    setMusicList(listM);
+  }, []);
+
+  return (
+    <>
+      {musicList.length !== 0 ? (
         <div className="upload-music-list-container">
-            <MusicList/>
+          <MusicList musicList={musicList} />
         </div>
-        /*<div className="upload-music-buttons-container">
-            <UploadMusic/>
-            <ScanForMusic/>
-        </div>*/
-    );
+      ) : (
+        <div className="upload-music-buttons-container">
+          <UploadMusic />
+          <ScanForMusic />
+        </div>
+      )}
+    </>
+  );
 }
 
 export default MainScreen;

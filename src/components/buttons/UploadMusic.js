@@ -14,6 +14,7 @@ function UploadMusic() {
       const audio = new Audio();
       jsmediatags.read(file, {
         onSuccess(tag) {
+          
           const url = URL.createObjectURL(file);
           audio.src = url;
           const track = {

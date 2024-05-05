@@ -67,7 +67,6 @@ function ScanForMusic() {
         <input
           type="file"
           id="scan-music"
-          name="fileList"
           directory=""
           webkitdirectory=""
           multiple

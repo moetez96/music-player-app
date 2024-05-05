@@ -1,8 +1,19 @@
+ 
 .music-list-wrapper {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    min-height: max-content;
+    padding-bottom: 150px;
     gap: 20px;
+    overflow: auto;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
+
 .upload-music-icons-container {
     width: 100%;
     display: flex;

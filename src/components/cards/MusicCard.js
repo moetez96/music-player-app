@@ -8,6 +8,24 @@ function MusicCard({ musicItem }) {
     return null;
   }
 
+  const handleClick = () => {
+    var listM = JSON.parse(localStorage.getItem("musicList")) || [];
+    const index = listM.findIndex((item) => item.url === musicItem.url);
+    if (index !== -1) {
+      listM = listM.map((ele, i) => {
+        if (i == index) {
+          ele.selected = true;
+        } else {
+          ele.selected = false;
+        }
+        return ele;
+      });
+
+      localStorage.setItem("musicList", JSON.stringify(listM));
+      window.dispatchEvent(new Event("storage"));
+    }
+  };
+
   const removeMusic = () => {
     const listM = JSON.parse(localStorage.getItem("musicList")) || [];
     const index = listM.findIndex((item) => item.url === musicItem.url);
@@ -20,7 +38,10 @@ function MusicCard({ musicItem }) {
   };
 
   return (
-    <div className="music-card">
+    <div
+      className={`music-card ${musicItem.selected ? 'selected' : ''}`}
+      onClick={handleClick}
+    >
       <span>
         <img
           src={musicPlaceholder}

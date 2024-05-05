@@ -2,32 +2,46 @@
     width: 1125px;
     min-height: 56px;
     border-radius: 66px;
-    background-color: rgb(51, 55, 59, 0.37);
+    background-color: rgba(51, 55, 59, 0.37);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 3%;
-    
+    transition: background-color 0.3s;
+  
+    &:hover {
+      background-color: rgba(51, 55, 59, 0.7);
+    }
+  
     span {
-        width: max-content;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 50px;
+      width: max-content;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 50px;
     }
-
+  
     p {
-        width: 14%;
-        display: flex;
-        font-size: 14px;
-        color: #FFFFFF;
+      width: 14%;
+      display: flex;
+      font-size: 14px;
+      color: #FFFFFF;
     }
-}
-
-.music-card-img {
+  
+    &.selected {
+      background-color: rgba(250, 205, 102, 0.37);
+  
+      &:hover {
+        background-color: rgba(250, 205, 102, 0.7);
+      }
+    }
+  }
+  
+  .music-card-img {
     height: 39px;
     width: 39px;
     border-radius: 8.53px;
     overflow: hidden;
-}
+  }
+  

@@ -23,7 +23,8 @@ function UploadMusic() {
             album: tag.tags.album || "Unknown",
             duration: 0,
             url: url,
-            addDate: Date.now()
+            addDate: Date.now(),
+            selected: false
           };
 
           audio.addEventListener("loadedmetadata", function () {

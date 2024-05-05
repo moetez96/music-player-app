@@ -32,6 +32,7 @@ function ScanForMusic() {
                 duration: 0,
                 url,
                 addDate: Date.now(),
+                selected: false
               };
 
               audio.addEventListener("loadedmetadata", function () {

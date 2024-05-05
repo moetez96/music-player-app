@@ -13,6 +13,7 @@ function MusicPlayer() {
   const [duration, setDuration] = useState(0);
   const [fileList, setFileList] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSong, setCurrentSong] = useState(null);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -25,6 +26,32 @@ function MusicPlayer() {
     const storedFileList = JSON.parse(localStorage.getItem("fileList")) || [];
     setFileList(storedFileList);
   }, []);
+
+  useEffect(() => {
+    const updateMusicList = () => {
+      const listM = JSON.parse(localStorage.getItem("musicList")) || [];
+      const index = listM.findIndex((item) => item.selected);
+      if (index !== -1) {
+        setCurrentSong(listM[index]);
+        const audioUrl = listM[index].url;
+        if (audioUrl) {
+          audioRef.current.src = audioUrl;
+          audioRef.current.addEventListener('loadedmetadata', () => {
+            setDuration(listM[index].duration);
+          });
+        } else {
+          console.error("Audio URL not found in local storage.");
+        }
+      }
+    };
+  
+    updateMusicList();
+    window.addEventListener("storage", updateMusicList);
+    return () => {
+      window.removeEventListener("storage", updateMusicList);
+    };
+  }, []);
+  
 
   const handleInputChange = (event) => {
     setValue(event.target.value);
@@ -53,13 +80,11 @@ function MusicPlayer() {
       setFileList((prevFileList) => [...prevFileList, url]);
       localStorage.setItem("fileList", JSON.stringify([...fileList, url]));
       
-      audioRef.current.addEventListener('loadedmetadata', () => {
-        setDuration(audioRef.current.duration);
-      });
+
     } else {
 
       // Handle error
-      console.error("Invalid file type. Please select an MP3 file.");
+      console.error("Invalid file type. Please select an audio file.");
     }
   };
 
@@ -71,8 +96,6 @@ function MusicPlayer() {
   return (
     <div className="player-wrapper">
       <div>
-        <input type="file" accept="audio" onChange={handleFileChange} 
-        />
         <audio
           ref={audioRef}
           controls
@@ -86,8 +109,8 @@ function MusicPlayer() {
             <img src={placeHolderImage} alt="cover" />
           </div>
           <div className="music-playing-shdes">
-            <p className="music-playing-title">Seasons in</p>
-            <p className="music-playing-artist">James</p>
+            <p className="music-playing-title">{currentSong ? currentSong.title : ""}</p>
+            <p className="music-playing-artist">{currentSong ? currentSong.artist : ""}</p>
           </div>
         </div>
         <div className="music-playing-options">

@@ -2,44 +2,42 @@ import "../../styles/components/cards.scss";
 import musicPlaceholder from "../../styles/assets/images/music_placeholder.jpg";
 import HeartIcon from "../icons/HeartIcon";
 import DeleteIcon from "../icons/DeleteIcon";
+import LocalBase from "localbase";
+import EventEmitter from "../../services/EventEmitter";
 
 function MusicCard({ musicItem }) {
-  if (!musicItem) {
-    return null;
-  }
+  const db = new LocalBase("musicDB");
 
-  const handleClick = () => {
-    var listM = JSON.parse(localStorage.getItem("musicList")) || [];
-    const index = listM.findIndex((item) => item.url === musicItem.url);
-    if (index !== -1) {
-      listM = listM.map((ele, i) => {
-        if (i == index) {
-          ele.selected = true;
+  const handleClick = async () => {
+    try {
+      const tracks = await db.collection("tracks").get();
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+        if (track.url === musicItem.url) {
+          track.selected = true;
         } else {
-          ele.selected = false;
+          track.selected = false;
         }
-        return ele;
-      });
-
-      localStorage.setItem("musicList", JSON.stringify(listM));
-      window.dispatchEvent(new Event("storage"));
+        await db.collection("tracks").doc({ url: track.url }).update(track);
+      }
+      EventEmitter.emit("tracksChanged");
+    } catch (error) {
+      console.error("Error updating track selection:", error);
     }
   };
 
-  const removeMusic = () => {
-    const listM = JSON.parse(localStorage.getItem("musicList")) || [];
-    const index = listM.findIndex((item) => item.url === musicItem.url);
-
-    if (index !== -1) {
-      listM.splice(index, 1);
-      localStorage.setItem("musicList", JSON.stringify(listM));
-      window.dispatchEvent(new Event("storage"));
+  const removeMusic = async () => {
+    try {
+      await db.collection("tracks").doc({ url: musicItem.url }).delete();
+      EventEmitter.emit("tracksChanged");
+    } catch (error) {
+      console.error("Error deleting track:", error);
     }
   };
 
   return (
     <div
-      className={`music-card ${musicItem.selected ? 'selected' : ''}`}
+      className={`music-card ${musicItem.selected ? "selected" : ""}`}
       onClick={handleClick}
     >
       <span>

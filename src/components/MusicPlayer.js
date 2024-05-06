@@ -1,17 +1,20 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import LocalBase from "localbase";
 import placeHolderImage from "../../src/styles/assets/images/placeholder.png";
 import "../styles/components/musicPlayer.scss";
 import VolUpIcon from "./icons/VolUpIcon";
 import SkipFwdIcon from "./icons/SkipFwdIcon";
 import SkipBackIcon from "./icons/SkipBackIcon";
 import PlayIcon from "./icons/PlayIcon";
+import EventEmitter from "../services/EventEmitter";
+
+const db = new LocalBase("musicDB");
 
 function MusicPlayer() {
   const initialValue = 50;
   const [value, setValue] = useState(initialValue);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [fileList, setFileList] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSong, setCurrentSong] = useState(null);
   const audioRef = useRef(null);
@@ -23,35 +26,42 @@ function MusicPlayer() {
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-duration", currentTime);
-    const storedFileList = JSON.parse(localStorage.getItem("fileList")) || [];
-    setFileList(storedFileList);
-  }, []);
+  }, [currentTime]);
 
   useEffect(() => {
     const updateMusicList = () => {
-      const listM = JSON.parse(localStorage.getItem("musicList")) || [];
-      const index = listM.findIndex((item) => item.selected);
-      if (index !== -1) {
-        setCurrentSong(listM[index]);
-        const audioUrl = listM[index].url;
-        if (audioUrl) {
-          audioRef.current.src = audioUrl;
-          audioRef.current.addEventListener('loadedmetadata', () => {
-            setDuration(listM[index].duration);
-          });
-        } else {
-          console.error("Audio URL not found in local storage.");
-        }
-      }
+      db.collection("tracks")
+        .get()
+        .then((listM) => {
+          const index = listM.findIndex((item) => item.selected);
+          if (index !== -1) {
+            setCurrentSong(listM[index]);
+            const audioUrl = listM[index].url;
+            if (audioUrl) {
+              audioRef.current.src = audioUrl;
+              audioRef.current.addEventListener("loadedmetadata", () => {
+                setDuration(listM[index].duration);
+              });
+            } else {
+              console.error("Audio URL not found in LocalBase.");
+            }
+          } else {
+            setCurrentSong(null);
+          }
+        })
+        .catch((error) =>
+          console.error("Error fetching music list from LocalBase:", error)
+        );
     };
-  
+
     updateMusicList();
-    window.addEventListener("storage", updateMusicList);
+
+    EventEmitter.on("tracksChanged", updateMusicList);
+
     return () => {
-      window.removeEventListener("storage", updateMusicList);
+      EventEmitter.off("tracksChanged", updateMusicList);
     };
   }, []);
-  
 
   const handleInputChange = (event) => {
     setValue(event.target.value);
@@ -72,25 +82,8 @@ function MusicPlayer() {
     document.documentElement.style.setProperty("--slider-value-duration", currentTime);
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file.type.startsWith("audio/")) {
-      const url = URL.createObjectURL(file);
-      audioRef.current.src = url;
-      setFileList((prevFileList) => [...prevFileList, url]);
-      localStorage.setItem("fileList", JSON.stringify([...fileList, url]));
-      
-
-    } else {
-
-      // Handle error
-      console.error("Invalid file type. Please select an audio file.");
-    }
-  };
-
   const updateTime = () => {
     setCurrentTime((audioRef.current.currentTime / duration) * 100);
-    document.documentElement.style.setProperty("--slider-value-duration", currentTime);
   };
 
   return (
@@ -122,7 +115,7 @@ function MusicPlayer() {
             <SkipFwdIcon />
           </div>
           <div className="music-playing-slider">
-          <input
+            <input
               type="range"
               min={0}
               max={100}

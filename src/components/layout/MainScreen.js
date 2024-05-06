@@ -1,23 +1,29 @@
+// MainScreen.js
+import React, { useEffect, useState } from "react";
 import UploadMusic from "../buttons/UploadMusic";
 import ScanForMusic from "../buttons/ScanForMusic";
 import MusicList from "./MusicList";
-import { useEffect, useState } from "react";
+import LocalBase from "localbase";
+import EventEmitter from "../../services/EventEmitter";
 
 function MainScreen() {
   const [musicList, setMusicList] = useState([]);
+  const db = new LocalBase("musicDB");
 
   useEffect(() => {
+    loadTracksFromDB();
 
-    const updateMusicList = () => {
-        const listM = JSON.parse(localStorage.getItem("musicList")) || [];
-        setMusicList(listM);
-      };
-      updateMusicList();
-        window.addEventListener("storage", updateMusicList);
-      return () => {
-        window.removeEventListener("storage", updateMusicList);
-      };
+    EventEmitter.on("tracksChanged", loadTracksFromDB);
+
+    return () => {
+      EventEmitter.off("tracksChanged", loadTracksFromDB);
+    };
   }, []);
+
+  const loadTracksFromDB = async () => {
+    const tracks = await db.collection("tracks").get();
+    setMusicList(tracks);
+  };
 
   return (
     <>

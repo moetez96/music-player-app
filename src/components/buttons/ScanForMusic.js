@@ -1,9 +1,31 @@
 import { useState } from "react";
 import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 import jsmediatags from "jsmediatags-web";
+import LocalBase from "localbase";
+import EventEmitter from "../../services/EventEmitter";
 
 function ScanForMusic() {
   const [tracks, setTracks] = useState([]);
+  const db = new LocalBase("musicDB");
+
+  const saveTrackToDB = async (track) => {
+    const existingTrack = await db
+      .collection("tracks")
+      .doc({ url: track.url })
+      .get();
+    if (existingTrack) {
+      console.log("Duplicate track found in IndexedDB:", track);
+      return;
+    }
+
+    try {
+      await db.collection("tracks").add({ ...track });
+      console.log("Track saved to IndexedDB:", track);
+      EventEmitter.emit("tracksChanged");
+    } catch (error) {
+      console.error("Error saving track to IndexedDB:", error);
+    }
+  };
 
   const handleFileChange = async (event) => {
     const fileList = event.target.files;
@@ -32,7 +54,7 @@ function ScanForMusic() {
                 duration: 0,
                 url,
                 addDate: Date.now(),
-                selected: false
+                selected: false,
               };
 
               audio.addEventListener("loadedmetadata", function () {
@@ -56,10 +78,8 @@ function ScanForMusic() {
     const processedTracks = await Promise.all(promises);
     const filteredTracks = processedTracks.filter((track) => track !== null);
     setTracks([...tracks, ...filteredTracks]);
-    const musicList = JSON.parse(localStorage.getItem("musicList")) || [];
-    musicList.push(...filteredTracks);
-    localStorage.setItem("musicList", JSON.stringify(musicList));
-    window.dispatchEvent(new Event("storage"));
+
+    filteredTracks.forEach(saveTrackToDB);
   };
 
   return (

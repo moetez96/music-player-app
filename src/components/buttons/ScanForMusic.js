@@ -34,15 +34,16 @@ function ScanForMusic() {
     try {
       const existingTrack = await db
         .collection("tracks")
-        .doc({ id: track.id })
+        .doc({ title: track.title, album: track.album, artist: track.artist})
         .get();
       if (existingTrack) {
         console.log("Duplicate track found in IndexedDB:", track);
         return;
       }
 
-      const uniqueId = await generateUniqueId();
-      await db.collection("tracks").add({ ...track, id: uniqueId, urlId: track.urlId });
+      const urlId = await saveUrlToDB(track.urlId);
+
+      await db.collection("tracks").add({ ...track, urlId: urlId });
       EventEmitter.emit("tracksChanged");
     } catch (error) {
       console.error("Error saving track to IndexedDB:", error);
@@ -70,7 +71,6 @@ function ScanForMusic() {
 
               const arrayBuffer = reader.result;
 
-              const urlId = await saveUrlToDB(arrayBuffer);
 
               const track = {
                 id: 0,
@@ -78,15 +78,13 @@ function ScanForMusic() {
                 artist: tag.tags.artist || "Unknown",
                 album: tag.tags.album || "Unknown",
                 duration: 0,
-                urlId: urlId,
+                urlId: arrayBuffer,
                 addDate: Date.now(),
                 selected: false,
               };
 
               audio.addEventListener("loadedmetadata", async function () {
-                let id = await generateUniqueId();
                 track.duration = audio.duration || 0;
-                track.id = id;
                 resolve(track);
               });
 
@@ -110,7 +108,7 @@ function ScanForMusic() {
     const tracksWithUniqueIds = await Promise.all(
       filteredTracks.map(async (track) => ({
         ...track,
-        id: await generateUniqueId("tracks"),
+        id: await generateUniqueId("tracks",),
       }))
     );
 

@@ -29,6 +29,7 @@ function MusicCard({ musicItem }) {
   const removeMusic = async () => {
     try {
       await db.collection("tracks").doc({ id: musicItem.id }).delete();
+      await db.collection("audioUrls").doc({ id: musicItem.urlId }).delete();
       EventEmitter.emit("tracksChanged");
     } catch (error) {
       console.error("Error deleting track:", error);

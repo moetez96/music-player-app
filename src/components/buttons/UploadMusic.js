@@ -44,7 +44,7 @@ function UploadMusic() {
               artist: tag.tags.artist || "Unknown",
               album: tag.tags.album || "Unknown",
               duration: 0,
-              urlId: "",
+              urlId: null,
               addDate: Date.now(),
               selected: false,
             };
@@ -54,12 +54,8 @@ function UploadMusic() {
             audio.src = url;
 
             audio.addEventListener("loadedmetadata", async function () {
-              let id = await generateUniqueId("tracks");
               track.duration = audio.duration || 0;
-              track.id = id;
-              const urlId = await saveUrlToDB(arrayBuffer);
-              track.urlId = urlId;
-              saveTrackToDB(track);
+              saveTrackToDB(track, arrayBuffer);
             });
 
             audio.load();
@@ -87,13 +83,22 @@ function UploadMusic() {
     }
   };
 
-  const saveTrackToDB = async (track) => {
+  const saveTrackToDB = async (track, arrayBuffer) => {
     try {
-      await db.collection("tracks").add({ ...track });
-      console.log("Track saved to IndexedDB:", track);
+      const existingTrack = await db
+        .collection("tracks")
+        .doc({ title: track.title, album: track.album, artist: track.artist})
+        .get();
+      if (existingTrack) {
+        console.log("Duplicate track found in IndexedDB:", track);
+        return;
+      }
+      const urlId = await saveUrlToDB(arrayBuffer);
+      const uniqueId = await generateUniqueId("tracks");
+      await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
       EventEmitter.emit("tracksChanged");
     } catch (error) {
-      console.error("Failed to save track to IndexedDB:", error);
+      console.error("Error saving track to IndexedDB:", error);
     }
   };
 

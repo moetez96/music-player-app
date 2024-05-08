@@ -8,19 +8,41 @@ function ScanForMusic() {
   const [tracks, setTracks] = useState([]);
   const db = new LocalBase("musicDB");
 
-  const saveTrackToDB = async (track) => {
-    const existingTrack = await db
-      .collection("tracks")
-      .doc({ url: track.url })
-      .get();
-    if (existingTrack) {
-      console.log("Duplicate track found in IndexedDB:", track);
-      return;
-    }
+  const generateUniqueId = async (collection) => {
+    let uniqueId;
+    let existingTrack;
+    do {
+      uniqueId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(
+        36
+      );
+      existingTrack = await db.collection(collection).doc({ id: uniqueId }).get();
+    } while (existingTrack);
+    return uniqueId;
+  };
 
+  const saveUrlToDB = async (arrayBuffer) => {
     try {
-      await db.collection("tracks").add({ ...track });
-      console.log("Track saved to IndexedDB:", track);
+      const id = await generateUniqueId("audioUrls");
+      const urlId = await db.collection("audioUrls").add({ id:id, arrayBuffer: arrayBuffer });
+      return urlId.data.data.id;
+    } catch (error) {
+      console.error("Failed to save URL to IndexedDB:", error);
+    }
+  };
+
+  const saveTrackToDB = async (track) => {
+    try {
+      const existingTrack = await db
+        .collection("tracks")
+        .doc({ id: track.id })
+        .get();
+      if (existingTrack) {
+        console.log("Duplicate track found in IndexedDB:", track);
+        return;
+      }
+
+      const uniqueId = await generateUniqueId();
+      await db.collection("tracks").add({ ...track, id: uniqueId, urlId: track.urlId });
       EventEmitter.emit("tracksChanged");
     } catch (error) {
       console.error("Error saving track to IndexedDB:", error);
@@ -34,8 +56,10 @@ function ScanForMusic() {
     const promises = fileListArray.map(async (file) => {
       if (file.type.startsWith("audio/")) {
         const reader = new FileReader();
-        return new Promise((resolve, reject) => {
-          reader.onload = async (e) => {
+        const audio = new Audio();
+
+        return new Promise(async (resolve, reject) => {
+          reader.onload = async () => {
             try {
               const tag = await new Promise((resolve, reject) => {
                 jsmediatags.read(file, {
@@ -43,32 +67,37 @@ function ScanForMusic() {
                   onError: reject,
                 });
               });
-              const audio = new Audio();
-              const url = URL.createObjectURL(file);
-              audio.src = url;
+
+              const arrayBuffer = reader.result;
+
+              const urlId = await saveUrlToDB(arrayBuffer);
 
               const track = {
+                id: 0,
                 title: tag.tags.title || "Unknown",
                 artist: tag.tags.artist || "Unknown",
                 album: tag.tags.album || "Unknown",
                 duration: 0,
-                url,
+                urlId: urlId,
                 addDate: Date.now(),
                 selected: false,
               };
 
-              audio.addEventListener("loadedmetadata", function () {
+              audio.addEventListener("loadedmetadata", async function () {
+                let id = await generateUniqueId();
                 track.duration = audio.duration || 0;
+                track.id = id;
                 resolve(track);
               });
 
+              audio.src = URL.createObjectURL(file);
               audio.load();
             } catch (error) {
               console.error("Error reading file metadata:", error);
               resolve(null);
             }
           };
-          reader.readAsDataURL(file);
+          reader.readAsArrayBuffer(file);
         });
       } else {
         return null;
@@ -77,9 +106,16 @@ function ScanForMusic() {
 
     const processedTracks = await Promise.all(promises);
     const filteredTracks = processedTracks.filter((track) => track !== null);
-    setTracks([...tracks, ...filteredTracks]);
 
-    filteredTracks.forEach(saveTrackToDB);
+    const tracksWithUniqueIds = await Promise.all(
+      filteredTracks.map(async (track) => ({
+        ...track,
+        id: await generateUniqueId("tracks"),
+      }))
+    );
+
+    setTracks([...tracks, ...tracksWithUniqueIds]);
+    tracksWithUniqueIds.forEach(saveTrackToDB);
   };
 
   return (

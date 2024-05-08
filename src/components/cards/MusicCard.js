@@ -13,12 +13,12 @@ function MusicCard({ musicItem }) {
       const tracks = await db.collection("tracks").get();
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
-        if (track.url === musicItem.url) {
+        if (track.id === musicItem.id) {
           track.selected = true;
         } else {
           track.selected = false;
         }
-        await db.collection("tracks").doc({ url: track.url }).update(track);
+        await db.collection("tracks").doc({ id: track.id }).update(track);
       }
       EventEmitter.emit("tracksChanged");
     } catch (error) {
@@ -28,7 +28,7 @@ function MusicCard({ musicItem }) {
 
   const removeMusic = async () => {
     try {
-      await db.collection("tracks").doc({ url: musicItem.url }).delete();
+      await db.collection("tracks").doc({ id: musicItem.id }).delete();
       EventEmitter.emit("tracksChanged");
     } catch (error) {
       console.error("Error deleting track:", error);

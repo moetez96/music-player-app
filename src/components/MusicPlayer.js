@@ -17,6 +17,7 @@ function MusicPlayer() {
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSong, setCurrentSong] = useState(null);
+  const [track, setTrack] = useState(null);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -25,33 +26,43 @@ function MusicPlayer() {
   }, [value]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--slider-value-duration", currentTime);
+    document.documentElement.style.setProperty(
+      "--slider-value-duration",
+      currentTime
+    );
   }, [currentTime]);
 
   useEffect(() => {
-    const updateMusicList = () => {
-      db.collection("tracks")
-        .get()
-        .then((listM) => {
-          const index = listM.findIndex((item) => item.selected);
-          if (index !== -1) {
-            setCurrentSong(listM[index]);
-            const audioUrl = listM[index].url;
-            if (audioUrl) {
-              audioRef.current.src = audioUrl;
-              audioRef.current.addEventListener("loadedmetadata", () => {
-                setDuration(listM[index].duration);
-              });
-            } else {
-              console.error("Audio URL not found in LocalBase.");
-            }
+    const updateMusicList = async () => {
+      try {
+        const listM = await db.collection("tracks").get();
+        const index = listM.findIndex((item) => item.selected);
+        if (index !== -1) {
+          const existingTrack = await db
+            .collection("audioUrls")
+            .doc({ id: listM[index].urlId })
+            .get();
+
+          setTrack(listM[index]);
+          const audioUrl = URL.createObjectURL(
+            new Blob([existingTrack.arrayBuffer])
+          );
+          setCurrentSong(audioUrl);
+          if (audioUrl) {
+            audioRef.current.src = audioUrl;
+            audioRef.current.addEventListener("loadedmetadata", () => {
+              setDuration(audioRef.current.duration);
+            });
           } else {
-            setCurrentSong(null);
+            console.error("Audio URL not found in LocalBase.");
           }
-        })
-        .catch((error) =>
-          console.error("Error fetching music list from LocalBase:", error)
-        );
+        } else {
+          setTrack(null);
+          setCurrentSong(null);
+        }
+      } catch (error) {
+        console.error("Error fetching music list from LocalBase:", error);
+      }
     };
 
     updateMusicList();
@@ -79,7 +90,10 @@ function MusicPlayer() {
   const handleSliderChange = (event) => {
     audioRef.current.currentTime = (event.target.value / 100) * duration;
     setCurrentTime(event.target.value);
-    document.documentElement.style.setProperty("--slider-value-duration", currentTime);
+    document.documentElement.style.setProperty(
+      "--slider-value-duration",
+      currentTime
+    );
   };
 
   const updateTime = () => {
@@ -102,8 +116,12 @@ function MusicPlayer() {
             <img src={placeHolderImage} alt="cover" />
           </div>
           <div className="music-playing-shdes">
-            <p className="music-playing-title">{currentSong ? currentSong.title : ""}</p>
-            <p className="music-playing-artist">{currentSong ? currentSong.artist : ""}</p>
+            <p className="music-playing-title">
+              {track ? track.title : ""}
+            </p>
+            <p className="music-playing-artist">
+              {track ? track.artist : ""}
+            </p>
           </div>
         </div>
         <div className="music-playing-options">

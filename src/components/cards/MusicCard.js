@@ -4,9 +4,17 @@ import HeartIcon from "../icons/HeartIcon";
 import DeleteIcon from "../icons/DeleteIcon";
 import LocalBase from "localbase";
 import EventEmitter from "../../services/EventEmitter";
+import { formatDuration } from "../../utils/Shared";
+import HeartIconRed from "../icons/HeartIconRed";
+import { useEffect, useState } from "react";
 
 function MusicCard({ musicItem }) {
   const db = new LocalBase("musicDB");
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    getFavorite();
+  }, [musicItem])
 
   const handleClick = async () => {
     try {
@@ -36,6 +44,35 @@ function MusicCard({ musicItem }) {
     }
   };
 
+  const handleFavorite = async () => {
+    try {
+      const existingTrack = await db
+        .collection("favoriteTracks")
+        .doc({ favoriteId: musicItem.id })
+        .get();
+      if (existingTrack) {
+        await db
+          .collection("favoriteTracks")
+          .doc({ favoriteId: musicItem.id })
+          .delete();
+      } else {
+        await db.collection("favoriteTracks").add({ favoriteId: musicItem.id });
+      }
+      EventEmitter.emit("tracksChanged");
+    } catch (error) {
+      console.error("Error saving favorite track to IndexedDB:", error);
+    }
+  };
+
+  const getFavorite = async () => {
+    const existingTrack = await db
+      .collection("favoriteTracks")
+      .doc({ favoriteId: musicItem.id })
+      .get();
+
+      setIsFavorite(existingTrack ? true : false);
+  };
+
   return (
     <div
       className={`music-card ${musicItem.selected ? "selected" : ""}`}
@@ -47,7 +84,9 @@ function MusicCard({ musicItem }) {
           alt="music-card-img"
           className="music-card-img"
         />
-        <HeartIcon />
+        <span onClick={handleFavorite}>
+          {isFavorite ? <HeartIconRed /> : <HeartIcon />}
+        </span>
       </span>
       <p>{musicItem.title}</p>
       <p>{musicItem.album}</p>
@@ -57,16 +96,6 @@ function MusicCard({ musicItem }) {
       </span>
     </div>
   );
-}
-
-function formatDuration(duration) {
-  if (!duration) {
-    return "--:--";
-  }
-
-  var minutes = Math.floor(duration / 60);
-  var remainingSeconds = Math.floor(duration % 60);
-  return minutes + ":" + remainingSeconds;
 }
 
 export default MusicCard;

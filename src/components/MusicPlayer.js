@@ -7,6 +7,7 @@ import SkipFwdIcon from "./icons/SkipFwdIcon";
 import SkipBackIcon from "./icons/SkipBackIcon";
 import PlayIcon from "./icons/PlayIcon";
 import EventEmitter from "../services/EventEmitter";
+import { formatDuration } from "../utils/Shared";
 
 const db = new LocalBase("musicDB");
 
@@ -51,6 +52,7 @@ function MusicPlayer() {
           if (audioUrl) {
             audioRef.current.src = audioUrl;
             audioRef.current.addEventListener("loadedmetadata", () => {
+              console.log(audioRef.current.duration);
               setDuration(audioRef.current.duration);
             });
           } else {
@@ -100,6 +102,12 @@ function MusicPlayer() {
     setCurrentTime((audioRef.current.currentTime / duration) * 100);
   };
 
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   return (
     <div className="player-wrapper">
       <div>
@@ -141,6 +149,7 @@ function MusicPlayer() {
               onChange={handleSliderChange}
               className="music-playing-sliders"
             />
+            <div className="music-playing-timer">{formatTime(currentTime * duration / 100)} - {formatDuration(duration)}</div>
           </div>
         </div>
         <div className="music-playing-volume">

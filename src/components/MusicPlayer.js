@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import LocalBase from "localbase";
 import placeHolderImage from "../../src/styles/assets/images/placeholder.png";
 import "../styles/components/musicPlayer.scss";
 import VolUpIcon from "./icons/VolUpIcon";
@@ -12,7 +11,6 @@ import RepeatIcon from "./icons/RepeatIcon";
 import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
 import {
-  getAllTracks,
   refreshMusicList,
   selectTrack,
 } from "../services/MusicDBService";
@@ -23,11 +21,11 @@ function MusicPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentSong, setCurrentSong] = useState(null);
   const [track, setTrack] = useState(null);
   const audioRef = useRef(null);
   const [repeat, setRepeat] = useState(null);
   const [firstMount, setFirstMount] = useState(true);
+  const [allTracks, setAlltracks] = useState([]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-volume", value);
@@ -42,6 +40,10 @@ function MusicPlayer() {
   }, [currentTime]);
 
   useEffect(() => {
+    if (!repeat) {
+      setIsPlaying(false);
+    }
+
     if (track && repeat != null && !firstMount && isPlaying) {
       setTimeout(() => {
         audioRef.current.play();
@@ -53,12 +55,11 @@ function MusicPlayer() {
     const updateMusicList = () => {
       refreshMusicList()
         .then((result) => {
-          console.log(result);
+          setAlltracks(result.tracks);
           if (result.track) {
             setTrack(result.track);
           }
           if (result.audioUrl) {
-            setCurrentSong(result.audioUrl);
             audioRef.current.src = result.audioUrl;
             audioRef.current.addEventListener("loadedmetadata", () => {
               setDuration(audioRef.current.duration);
@@ -113,13 +114,12 @@ function MusicPlayer() {
   };
 
   const nextTrack = async () => {
-    const tracks = await getAllTracks();
-    if (tracks?.empty) {
+    if (allTracks?.empty) {
       console.log("No tracks found");
     } else {
-      const trackIndex = await tracks?.findIndex((doc) => doc.id === track.id);
-      if (trackIndex !== -1 && trackIndex < tracks?.length) {
-        await selectTrack(tracks[trackIndex + 1]);
+      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
+      if (trackIndex !== -1 && trackIndex < allTracks?.length) {
+        await selectTrack(allTracks[trackIndex + 1]);
         EventEmitter.emit("tracksChanged");
       } else {
         setIsPlaying(false);
@@ -129,13 +129,12 @@ function MusicPlayer() {
   };
 
   const previousTrack = async () => {
-    const tracks = await getAllTracks();
-    if (tracks?.empty) {
+    if (allTracks?.empty) {
       console.log("No tracks found");
     } else {
-      const trackIndex = await tracks?.findIndex((doc) => doc.id === track.id);
+      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
       if (trackIndex !== -1 && trackIndex > 0) {
-        await selectTrack(tracks[trackIndex - 1]);
+        await selectTrack(allTracks[trackIndex - 1]);
         EventEmitter.emit("tracksChanged");
       } else {
         setIsPlaying(false);
@@ -198,16 +197,16 @@ function MusicPlayer() {
           <div className="music-playing-buttons">
             <PlayRandomIcon />
             <span onClick={previousTrack}>
-              <SkipBackIcon />
+              <SkipBackIcon isClickable={0 === allTracks?.findIndex((doc) => doc.id === track.id)} />
             </span>
             <span onClick={playAudio}>
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </span>
             <span onClick={nextTrack}>
-              <SkipFwdIcon />
+              <SkipFwdIcon isClickable={(allTracks?.length - 1) === allTracks?.findIndex((doc) => doc.id === track.id)} />
             </span>
             <span onClick={handleRepeat}>
-              <RepeatIcon repeat={repeat} />
+              <RepeatIcon repeat={repeat}/>
             </span>
           </div>
           <div className="music-playing-slider">

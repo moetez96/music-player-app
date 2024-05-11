@@ -31,7 +31,7 @@ const getAllTracks = async () => {
 };
 
 const refreshMusicList = async () => {
-  const result = { track: null, audioUrl: null };
+  const result = {tracks: [], track: null, audioUrl: null };
 
   try {
     const listM = await db.collection("tracks").get();
@@ -46,6 +46,7 @@ const refreshMusicList = async () => {
         new Blob([existingTrack.arrayBuffer])
       );
       result.audioUrl = audioUrl;
+      result.tracks = listM;
     }
   } catch (error) {
     console.error("Error fetching music list from LocalBase:", error);

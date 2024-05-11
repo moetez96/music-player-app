@@ -43,9 +43,10 @@ function MusicPlayer() {
 
   useEffect(() => {
     if (track && repeat != null && !firstMount) {
-      audioRef.current.play();
+      setTimeout(() => {
+        audioRef.current.play();
+      }, 100);
     }
-    setRepeat(repeat != null ? repeat : null);
   }, [track, firstMount]);
   
 
@@ -88,11 +89,11 @@ function MusicPlayer() {
     setValue(event.target.value);
   };
 
-  const playAudio = () => {
+  const playAudio = async() => {
     if (isPlaying) {
-      audioRef.current.pause();
+      await audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      await audioRef.current.play();
     }
     setIsPlaying(!isPlaying);
   };
@@ -135,10 +136,11 @@ function MusicPlayer() {
           console.log("No tracks found");
         } else {
           const trackIndex = tracks.findIndex((doc) => doc.id === track.id);
-          if (trackIndex !== -1) {
+          if (trackIndex !== -1 && tracks.length < track) {
             await selectTrack(tracks[trackIndex + 1]);
             EventEmitter.emit("tracksChanged");
           } else {
+            setIsPlaying(false);
             console.log("No tracks found");
           }
         }

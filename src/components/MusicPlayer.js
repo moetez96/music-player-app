@@ -10,10 +10,7 @@ import { formatDuration } from "../utils/Shared";
 import RepeatIcon from "./icons/RepeatIcon";
 import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
-import {
-  refreshMusicList,
-  selectTrack,
-} from "../services/MusicDBService";
+import { refreshMusicList, selectTrack } from "../services/MusicDBService";
 
 function MusicPlayer() {
   const initialValue = 50;
@@ -24,8 +21,9 @@ function MusicPlayer() {
   const [track, setTrack] = useState(null);
   const audioRef = useRef(null);
   const [repeat, setRepeat] = useState(null);
+  const [shuffle, setShuffle] = useState(false);
   const [firstMount, setFirstMount] = useState(true);
-  const [allTracks, setAlltracks] = useState([]);
+  const [allTracks, setAllTracks] = useState([]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-volume", value);
@@ -55,7 +53,7 @@ function MusicPlayer() {
     const updateMusicList = () => {
       refreshMusicList()
         .then((result) => {
-          setAlltracks(result.tracks);
+          setAllTracks(result.tracks);
           if (result.track) {
             setTrack(result.track);
           }
@@ -113,18 +111,30 @@ function MusicPlayer() {
     });
   };
 
+  const handleShuffle = () => {
+    setShuffle(!shuffle);
+  };
+
   const nextTrack = async () => {
     if (allTracks?.empty) {
       console.log("No tracks found");
     } else {
-      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
-      if (trackIndex !== -1 && trackIndex < allTracks?.length) {
+      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);      
+      if (shuffle) {
+        var randomIndex;
+        do {
+          randomIndex = Math.floor(Math.random() * allTracks?.length);
+        } while (randomIndex === trackIndex);
+
+        await selectTrack(allTracks[randomIndex]);
+      
+      } else if (trackIndex !== -1 && trackIndex < allTracks?.length) {
         await selectTrack(allTracks[trackIndex + 1]);
-        EventEmitter.emit("tracksChanged");
       } else {
         setIsPlaying(false);
         console.log("No tracks found");
       }
+      EventEmitter.emit("tracksChanged");
     }
   };
 
@@ -195,18 +205,29 @@ function MusicPlayer() {
         </div>
         <div className="music-playing-options">
           <div className="music-playing-buttons">
-            <PlayRandomIcon />
+          <span onClick={handleShuffle}>
+            <PlayRandomIcon isShuffle={shuffle}/>
+            </span>
             <span onClick={previousTrack}>
-              <SkipBackIcon isClickable={0 === allTracks?.findIndex((doc) => doc.id === track.id)} />
+              <SkipBackIcon
+                isClickable={
+                  0 === allTracks?.findIndex((doc) => doc.id === track.id)
+                }
+              />
             </span>
             <span onClick={playAudio}>
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </span>
             <span onClick={nextTrack}>
-              <SkipFwdIcon isClickable={(allTracks?.length - 1) === allTracks?.findIndex((doc) => doc.id === track.id)} />
+              <SkipFwdIcon
+                isClickable={
+                  allTracks?.length - 1 ===
+                  allTracks?.findIndex((doc) => doc.id === track.id)
+                }
+              />
             </span>
             <span onClick={handleRepeat}>
-              <RepeatIcon repeat={repeat}/>
+              <RepeatIcon repeat={repeat} />
             </span>
           </div>
           <div className="music-playing-slider">

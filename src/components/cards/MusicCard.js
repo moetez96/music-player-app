@@ -2,20 +2,27 @@ import "../../styles/components/cards.scss";
 import musicPlaceholder from "../../styles/assets/images/music_placeholder.jpg";
 import HeartIcon from "../icons/HeartIcon";
 import DeleteIcon from "../icons/DeleteIcon";
-import LocalBase from "localbase";
 import EventEmitter from "../../services/EventEmitter";
 import { formatDuration } from "../../utils/Shared";
 import HeartIconRed from "../icons/HeartIconRed";
 import { useEffect, useState } from "react";
-import { selectTrack } from "../../services/MusicDBService";
+import {
+  deleteTrack,
+  getFavorite,
+  handleFavoriteTrack,
+  selectTrack,
+} from "../../services/MusicDBService";
 
 function MusicCard({ musicItem }) {
-  const db = new LocalBase("musicDB");
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    getFavorite();
-  }, []);
+    if (musicItem) {
+      getFavorite(musicItem).then((existingTrack) =>
+        setIsFavorite(existingTrack ? true : false)
+      );
+    }
+  }, [musicItem]);
 
   const handleClick = async () => {
     await selectTrack(musicItem);
@@ -23,44 +30,13 @@ function MusicCard({ musicItem }) {
   };
 
   const removeMusic = async () => {
-    try {
-      await db.collection("tracks").doc({ id: musicItem.id }).delete();
-      await db.collection("audioUrls").doc({ id: musicItem.urlId }).delete();
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error deleting track:", error);
-    }
+    await deleteTrack(musicItem);
   };
 
   const handleFavorite = async () => {
-    try {
-      const existingTrack = await db
-        .collection("favoriteTracks")
-        .doc({ favoriteId: musicItem.id })
-        .get();
-      if (existingTrack) {
-        await db
-          .collection("favoriteTracks")
-          .doc({ favoriteId: musicItem.id })
-          .delete();
-        setIsFavorite(false);
-      } else {
-        await db.collection("favoriteTracks").add({ favoriteId: musicItem.id });
-        setIsFavorite(true);
-      }
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error saving favorite track to IndexedDB:", error);
-    }
-  };
-
-  const getFavorite = async () => {
-    const existingTrack = await db
-      .collection("favoriteTracks")
-      .doc({ favoriteId: musicItem.id })
-      .get();
-
-    setIsFavorite(existingTrack ? true : false);
+    handleFavoriteTrack(musicItem)
+      .then((result) => setIsFavorite(result))
+      .catch((err) => console.log(err));
   };
 
   return (

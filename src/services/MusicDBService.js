@@ -31,7 +31,7 @@ const getAllTracks = async () => {
 };
 
 const refreshMusicList = async () => {
-  const result = {tracks: [], track: null, audioUrl: null };
+  const result = { tracks: [], track: null, audioUrl: null };
 
   try {
     const listM = await db.collection("tracks").get();
@@ -55,4 +55,49 @@ const refreshMusicList = async () => {
   return result;
 };
 
-export { selectTrack, getAllTracks, refreshMusicList };
+const deleteTrack = async (musicItem) => {
+  try {
+    await db.collection("tracks").doc({ id: musicItem.id }).delete();
+    await db.collection("audioUrls").doc({ id: musicItem.urlId }).delete();
+    EventEmitter.emit("tracksChanged");
+  } catch (error) {
+    console.error("Error deleting track:", error);
+  }
+};
+
+const handleFavoriteTrack = async (musicItem) => {
+  try {
+    const existingTrack = await db
+      .collection("favoriteTracks")
+      .doc({ favoriteId: musicItem.id })
+      .get();
+    if (existingTrack) {
+      await db
+        .collection("favoriteTracks")
+        .doc({ favoriteId: musicItem.id })
+        .delete();
+      return false;
+    } else {
+      await db.collection("favoriteTracks").add({ favoriteId: musicItem.id });
+      return true;
+    }
+  } catch (error) {
+    console.error("Error saving favorite track to IndexedDB:", error);
+  }
+};
+
+const getFavorite = async (musicItem) => {
+  return await db
+    .collection("favoriteTracks")
+    .doc({ favoriteId: musicItem.id })
+    .get();
+};
+
+export {
+  selectTrack,
+  getAllTracks,
+  refreshMusicList,
+  deleteTrack,
+  handleFavoriteTrack,
+  getFavorite,
+};

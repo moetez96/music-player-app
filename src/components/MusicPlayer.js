@@ -8,6 +8,10 @@ import SkipBackIcon from "./icons/SkipBackIcon";
 import PlayIcon from "./icons/PlayIcon";
 import EventEmitter from "../services/EventEmitter";
 import { formatDuration } from "../utils/Shared";
+import PlayOnceIcon from "./icons/PlayOnceIcon";
+import PlayRandomIcon from "./icons/PlayRandomIcon";
+import PauseIcon from "./icons/PauseIcon";
+import { getAllTracks, refreshMusicList, selectTrack, updateMusicList } from "../services/MusicDBService";
 
 const db = new LocalBase("musicDB");
 
@@ -20,6 +24,7 @@ function MusicPlayer() {
   const [currentSong, setCurrentSong] = useState(null);
   const [track, setTrack] = useState(null);
   const audioRef = useRef(null);
+  const[autoPlay, setAutoPlay] = useState(false);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-volume", value);
@@ -33,44 +38,37 @@ function MusicPlayer() {
     );
   }, [currentTime]);
 
+  
   useEffect(() => {
-    const updateMusicList = async () => {
-      try {
-        const listM = await db.collection("tracks").get();
-        const index = listM.findIndex((item) => item.selected);
-        if (index !== -1) {
-          const existingTrack = await db
-            .collection("audioUrls")
-            .doc({ id: listM[index].urlId })
-            .get();
-
-          setTrack(listM[index]);
-          const audioUrl = URL.createObjectURL(
-            new Blob([existingTrack.arrayBuffer])
-          );
-          setCurrentSong(audioUrl);
-          if (audioUrl) {
-            audioRef.current.src = audioUrl;
-            audioRef.current.addEventListener("loadedmetadata", () => {
-              console.log(audioRef.current.duration);
-              setDuration(audioRef.current.duration);
-            });
-          } else {
-            console.error("Audio URL not found in LocalBase.");
-          }
-        } else {
-          setTrack(null);
-          setCurrentSong(null);
+    const updateMusicList = () =>{
+      refreshMusicList()
+      .then((result) => {
+        console.log(result);
+        if (result.track) {
+          setTrack(result.track);
         }
-      } catch (error) {
-        console.error("Error fetching music list from LocalBase:", error);
-      }
-    };
-
+        if (result.audioUrl) {
+          setCurrentSong(result.audioUrl)
+          audioRef.current.src = result.audioUrl;
+          audioRef.current.addEventListener("loadedmetadata", () => {
+            setDuration(audioRef.current.duration);
+            console.log(autoPlay)
+            if (autoPlay) {
+              audioRef.current.play();
+            }
+          });
+        } else {
+          console.error("Audio URL not found in LocalBase.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating music list:", error);
+      });
+    }
+    
     updateMusicList();
-
     EventEmitter.on("tracksChanged", updateMusicList);
-
+    
     return () => {
       EventEmitter.off("tracksChanged", updateMusicList);
     };
@@ -96,10 +94,30 @@ function MusicPlayer() {
       "--slider-value-duration",
       currentTime
     );
+
   };
 
-  const updateTime = () => {
+  const updateTime = async () => {
     setCurrentTime((audioRef.current.currentTime / duration) * 100);
+  
+    if (audioRef.current.currentTime === duration) {
+
+      const tracks = await getAllTracks();
+
+      if (tracks.empty) {
+        console.log("No tracks found");
+      } else {
+        const trackIndex = tracks.findIndex(doc => doc.id === track.id);
+        if (trackIndex !== -1) {
+          await selectTrack(tracks[trackIndex+1]);
+          setAutoPlay(true);
+          EventEmitter.emit("tracksChanged");
+        } else {
+          console.log("No tracks found");
+        }
+      }
+
+    }
   };
 
   const formatTime = (timeInSeconds) => {
@@ -124,32 +142,33 @@ function MusicPlayer() {
             <img src={placeHolderImage} alt="cover" />
           </div>
           <div className="music-playing-shdes">
-            <p className="music-playing-title">
-              {track ? track.title : ""}
-            </p>
-            <p className="music-playing-artist">
-              {track ? track.artist : ""}
-            </p>
+            <p className="music-playing-title">{track ? track.title : ""}</p>
+            <p className="music-playing-artist">{track ? track.artist : ""}</p>
           </div>
         </div>
         <div className="music-playing-options">
           <div className="music-playing-buttons">
+            <PlayRandomIcon />
             <SkipBackIcon />
             <div onClick={playAudio}>
-              <PlayIcon />
+              { isPlaying ? (<PauseIcon />) : (<PlayIcon />) }
             </div>
             <SkipFwdIcon />
+            <PlayOnceIcon />
           </div>
           <div className="music-playing-slider">
             <input
               type="range"
               min={0}
               max={100}
-              value={currentTime}
+              value={currentTime ? currentTime : 0}
               onChange={handleSliderChange}
               className="music-playing-sliders"
             />
-            <div className="music-playing-timer">{formatTime(currentTime * duration / 100)} - {formatDuration(duration)}</div>
+            <div className="music-playing-timer">
+              {formatTime(((currentTime ? currentTime : 0) * duration) / 100)} -{" "}
+              {formatDuration(duration)}
+            </div>
           </div>
         </div>
         <div className="music-playing-volume">

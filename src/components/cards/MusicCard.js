@@ -7,6 +7,7 @@ import EventEmitter from "../../services/EventEmitter";
 import { formatDuration } from "../../utils/Shared";
 import HeartIconRed from "../icons/HeartIconRed";
 import { useEffect, useState } from "react";
+import { selectTrack } from "../../services/MusicDBService";
 
 function MusicCard({ musicItem }) {
   const db = new LocalBase("musicDB");
@@ -14,24 +15,11 @@ function MusicCard({ musicItem }) {
 
   useEffect(() => {
     getFavorite();
-  }, [musicItem])
+  }, []);
 
   const handleClick = async () => {
-    try {
-      const tracks = await db.collection("tracks").get();
-      for (let i = 0; i < tracks.length; i++) {
-        const track = tracks[i];
-        if (track.id === musicItem.id) {
-          track.selected = true;
-        } else {
-          track.selected = false;
-        }
-        await db.collection("tracks").doc({ id: track.id }).update(track);
-      }
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error updating track selection:", error);
-    }
+    await selectTrack(musicItem);
+    EventEmitter.emit("tracksChanged");
   };
 
   const removeMusic = async () => {
@@ -55,8 +43,10 @@ function MusicCard({ musicItem }) {
           .collection("favoriteTracks")
           .doc({ favoriteId: musicItem.id })
           .delete();
+        setIsFavorite(false);
       } else {
         await db.collection("favoriteTracks").add({ favoriteId: musicItem.id });
+        setIsFavorite(true);
       }
       EventEmitter.emit("tracksChanged");
     } catch (error) {
@@ -70,7 +60,7 @@ function MusicCard({ musicItem }) {
       .doc({ favoriteId: musicItem.id })
       .get();
 
-      setIsFavorite(existingTrack ? true : false);
+    setIsFavorite(existingTrack ? true : false);
   };
 
   return (

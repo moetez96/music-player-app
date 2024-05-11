@@ -14,7 +14,7 @@ import PauseIcon from "./icons/PauseIcon";
 import {
   getAllTracks,
   refreshMusicList,
-  selectTrack
+  selectTrack,
 } from "../services/MusicDBService";
 
 function MusicPlayer() {
@@ -42,13 +42,12 @@ function MusicPlayer() {
   }, [currentTime]);
 
   useEffect(() => {
-    if (track && repeat != null && !firstMount) {
+    if (track && repeat != null && !firstMount && isPlaying) {
       setTimeout(() => {
         audioRef.current.play();
       }, 100);
     }
   }, [track, firstMount]);
-  
 
   useEffect(() => {
     const updateMusicList = () => {
@@ -89,7 +88,7 @@ function MusicPlayer() {
     setValue(event.target.value);
   };
 
-  const playAudio = async() => {
+  const playAudio = async () => {
     if (isPlaying) {
       await audioRef.current.pause();
     } else {
@@ -97,6 +96,7 @@ function MusicPlayer() {
     }
     setIsPlaying(!isPlaying);
   };
+
   const handleRepeat = () => {
     setRepeat((prevState) => {
       switch (prevState) {
@@ -111,7 +111,38 @@ function MusicPlayer() {
       }
     });
   };
-  
+
+  const nextTrack = async () => {
+    const tracks = await getAllTracks();
+    if (tracks?.empty) {
+      console.log("No tracks found");
+    } else {
+      const trackIndex = await tracks?.findIndex((doc) => doc.id === track.id);
+      if (trackIndex !== -1 && trackIndex < tracks?.length) {
+        await selectTrack(tracks[trackIndex + 1]);
+        EventEmitter.emit("tracksChanged");
+      } else {
+        setIsPlaying(false);
+        console.log("No tracks found");
+      }
+    }
+  };
+
+  const previousTrack = async () => {
+    const tracks = await getAllTracks();
+    if (tracks?.empty) {
+      console.log("No tracks found");
+    } else {
+      const trackIndex = await tracks?.findIndex((doc) => doc.id === track.id);
+      if (trackIndex !== -1 && trackIndex > 0) {
+        await selectTrack(tracks[trackIndex - 1]);
+        EventEmitter.emit("tracksChanged");
+      } else {
+        setIsPlaying(false);
+        console.log("No tracks found");
+      }
+    }
+  };
 
   const handleSliderChange = (event) => {
     audioRef.current.currentTime = (event.target.value / 100) * duration;
@@ -127,27 +158,13 @@ function MusicPlayer() {
 
     if (audioRef.current.currentTime === duration) {
       if (repeat === "One") {
-          setTrack(track);
-          EventEmitter.emit("tracksChanged");
+        setTrack(track);
+        EventEmitter.emit("tracksChanged");
       } else if (repeat === "All") {
-        const tracks = await getAllTracks();
-
-        if (tracks.empty) {
-          console.log("No tracks found");
-        } else {
-          const trackIndex = tracks.findIndex((doc) => doc.id === track.id);
-          if (trackIndex !== -1 && tracks.length < track) {
-            await selectTrack(tracks[trackIndex + 1]);
-            EventEmitter.emit("tracksChanged");
-          } else {
-            setIsPlaying(false);
-            console.log("No tracks found");
-          }
-        }
-      } else if (repeat === null){
+        nextTrack();
+      } else if (repeat === null) {
         setIsPlaying(false);
       }
-     
     }
   };
 
@@ -180,11 +197,15 @@ function MusicPlayer() {
         <div className="music-playing-options">
           <div className="music-playing-buttons">
             <PlayRandomIcon />
-            <SkipBackIcon />
+            <span onClick={previousTrack}>
+              <SkipBackIcon />
+            </span>
             <span onClick={playAudio}>
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </span>
-            <SkipFwdIcon />
+            <span onClick={nextTrack}>
+              <SkipFwdIcon />
+            </span>
             <span onClick={handleRepeat}>
               <RepeatIcon repeat={repeat} />
             </span>

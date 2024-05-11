@@ -25,3 +25,38 @@ input[type="file"] {
       background-color: rgba(51, 55, 59, 0.9);
     }
   }
+
+  @media (max-width: 1024px) {
+    .upload-button {
+      line-height: 26px;
+      height: 30px;
+      font-size: 12px;
+      border-radius: 20px;
+      padding: 0 15px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .upload-button {
+      line-height: 20px;
+      height: 30px;
+      width: max-content;
+      border-radius: 20px;
+      padding: 10px;
+      margin: 0;
+      line-height: 0;
+      gap: 0;
+      justify-content: none;
+      align-items: none;
+      
+      span {
+        font-size: 0;
+      }
+    }    
+  }
+  
+  @media (max-width: 580px) {
+    .upload-button {
+
+    }
+  }

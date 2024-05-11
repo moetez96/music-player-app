@@ -1,4 +1,3 @@
-// MainScreen.js
 import React, { useEffect, useState } from "react";
 import UploadMusic from "../buttons/UploadMusic";
 import ScanForMusic from "../buttons/ScanForMusic";

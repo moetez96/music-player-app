@@ -50,14 +50,14 @@ function MusicCard({ musicItem }) {
           alt="music-card-img"
           className="music-card-img"
         />
-        <span onClick={handleFavorite}>
+        <span onClick={handleFavorite} className="music-card-fav-icon">
           {isFavorite ? <HeartIconRed /> : <HeartIcon />}
         </span>
       </span>
       <p>{musicItem.title}</p>
       <p>{musicItem.album}</p>
       <p>{formatDuration(musicItem.duration)}</p>
-      <span onClick={removeMusic}>
+      <span onClick={removeMusic} className="music-card-delete-icon">
         <DeleteIcon />
       </span>
     </div>

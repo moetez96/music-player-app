@@ -114,7 +114,7 @@ function UploadMusic() {
       />
       <label htmlFor="upload-music" className="upload-button">
         <UploadMusicIcon />
-        Upload Music
+        <span>Upload Music</span>
       </label>
     </>
   );

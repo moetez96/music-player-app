@@ -1,5 +1,5 @@
 .music-card {
-    width: 1125px;
+    width: 90%;
     min-height: 56px;
     border-radius: 66px;
     background-color: rgba(51, 55, 59, 0.37);
@@ -45,3 +45,123 @@
     overflow: hidden;
   }
   
+
+  @media (max-width: 1024px) {
+    .music-card {
+      min-height: 50px;
+
+      span {
+        gap: 20px;
+      }
+    
+      p {
+        width: 16%;
+        font-size: 13px;
+      }
+    }
+
+    .music-card-img {
+      height: 35px;
+      width: 35px;
+    }
+  }
+
+  @media (max-width: 768px) {
+
+    .music-card {
+      border-radius: 10px;
+      position: relative;
+      justify-content: none;
+      gap: 10px;
+
+      p {
+        font-size: 12px;
+      }
+
+      span {
+        width: max-content;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+    }
+
+    .music-card-img {
+      height: 33px;
+      width: 33px;
+    }
+}
+
+  @media (max-width: 580px) {
+
+    .music-card {
+      p {
+        width: 35%;
+        font-size: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      > p:nth-child(2) {
+        position: absolute;
+        left: 70px;
+        top: 12px;
+        font-weight: bold;
+      }
+
+      > p:nth-child(3) {
+        position: absolute;
+        left: 70px;
+        top: 28px;
+      }
+
+      > p:nth-child(4) {
+        position: absolute;
+        right: 12px;
+        bottom: 3px;
+        width:fit-content;
+      }
+    }
+
+    .music-card-fav-icon {
+      position: absolute;
+      right: 50px;
+      top: 7px;
+    }
+
+    .music-card-delete-icon {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
+  }
+
+  @media (max-width: 425px) {
+
+    .music-card {
+
+      p {
+        font-size: 10px;
+      }
+
+      > p:nth-child(2) {
+        position: absolute;
+        left: 60px;
+        top: 12px;
+      }
+
+      > p:nth-child(3) {
+        left: 60px;
+        top: 28px;
+      }
+    }
+
+    .music-card-fav-icon {
+      top: 5px;
+    }
+
+    .music-card-delete-icon {
+      top: 7px;
+    }
+  }

@@ -9,13 +9,15 @@
     overflow: auto;
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
+    width: 90%;
+    margin: 0 auto;
     &::-webkit-scrollbar {
         display: none;
     }
 }
 
 .upload-music-icons-container {
-    width: 100%;
+    width: 90%;
     display: flex;
     justify-content: flex-end;
     gap: 10px;

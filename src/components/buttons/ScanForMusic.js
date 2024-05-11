@@ -130,7 +130,7 @@ function ScanForMusic() {
       </div>
       <label htmlFor="scan-music" className="upload-button">
         <ScanForMusicIcon />
-        Scan your device for music
+        <span>Scan your device for music</span>
       </label>
     </>
   );

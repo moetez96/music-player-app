@@ -243,9 +243,15 @@
     }
 
     .music-playing-volume {
+        position: absolute;
+        top: 24px;
+        right: 8px;
+    }
+    
+    .music-volume-sliders {
         display: none;
     }
-
+    
     .music-playing-options {
         display: flex;
         gap: 1px;

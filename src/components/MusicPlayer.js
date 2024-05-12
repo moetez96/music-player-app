@@ -38,7 +38,7 @@ function MusicPlayer() {
   }, [currentTime]);
 
   useEffect(() => {
-    
+
     if (!repeat) {
       setIsPlaying(false);
     }
@@ -86,6 +86,16 @@ function MusicPlayer() {
 
   const handleInputChange = (event) => {
     setValue(event.target.value);
+  };
+
+  const changeVolume = () => {
+    if (value < 20 && value !== 0) {
+      setValue(0);
+    } else if (value === 0) {
+      setValue(100);
+    } else {
+      setValue(value / 2);
+    }
   };
 
   const playAudio = async () => {
@@ -247,7 +257,9 @@ function MusicPlayer() {
           </div>
         </div>
         <div className="music-playing-volume">
-          <VolUpIcon />
+          <span onClick={changeVolume}>
+            <VolUpIcon value={value}/>
+          </span>
           <input
             type="range"
             min={0}

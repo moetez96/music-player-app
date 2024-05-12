@@ -15,33 +15,38 @@ import {
 
 function MusicCard({ musicItem }) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
 
   useEffect(() => {
-    if (musicItem) {
-      getFavorite(musicItem).then((existingTrack) =>
+    setCurrentTrack(musicItem);
+  }, [musicItem]);
+
+  useEffect(() => {
+    if (currentTrack) {
+      getFavorite(currentTrack).then((existingTrack) =>
         setIsFavorite(existingTrack ? true : false)
       );
     }
-  }, [musicItem]);
+  }, [currentTrack]);
 
   const handleClick = async () => {
-    await selectTrack(musicItem);
+    await selectTrack(currentTrack);
     EventEmitter.emit("tracksChanged");
   };
 
   const removeMusic = async () => {
-    await deleteTrack(musicItem);
+    await deleteTrack(currentTrack);
   };
 
   const handleFavorite = async () => {
-    handleFavoriteTrack(musicItem)
+    handleFavoriteTrack(currentTrack)
       .then((result) => setIsFavorite(result))
       .catch((err) => console.log(err));
   };
 
   return (
     <div
-      className={`music-card ${musicItem.selected ? "selected" : ""}`}
+      className={`music-card ${currentTrack?.selected ? "selected" : ""}`}
       onClick={handleClick}
     >
       <span>
@@ -54,9 +59,9 @@ function MusicCard({ musicItem }) {
           {isFavorite ? <HeartIconRed /> : <HeartIcon />}
         </span>
       </span>
-      <p>{musicItem.title}</p>
-      <p>{musicItem.album}</p>
-      <p>{formatDuration(musicItem.duration)}</p>
+      <p>{currentTrack?.title}</p>
+      <p>{currentTrack?.album}</p>
+      <p>{formatDuration(currentTrack?.duration)}</p>
       <span onClick={removeMusic} className="music-card-delete-icon">
         <DeleteIcon />
       </span>

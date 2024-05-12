@@ -5,16 +5,21 @@ const db = new Localbase("musicDB");
 
 const selectTrack = async (musicItem) => {
   try {
-    const tracks = await db.collection("tracks").get();
-
-    for (let i = 0; i < tracks.length; i++) {
-      const track = tracks[i];
-      if (track.id === musicItem.id) {
-        track.selected = true;
-      } else {
-        track.selected = false;
+    const existingTrack = await db
+      .collection("tracks")
+      .doc({ id: musicItem.id })
+      .get();
+    if (existingTrack !== null || existingTrack !== undefined) {
+      const tracks = await db.collection("tracks").get();
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+        if (track.id === musicItem.id) {
+          track.selected = true;
+        } else {
+          track.selected = false;
+        }
+        await db.collection("tracks").doc({ id: track.id }).update(track);
       }
-      await db.collection("tracks").doc({ id: track.id }).update(track);
     }
   } catch (error) {
     console.error("Error updating track selection:", error);

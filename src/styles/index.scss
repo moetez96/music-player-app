@@ -50,7 +50,8 @@ code {
   align-items: center;
   justify-content: center;
   width: 100%;
-  gap: 24px;
+  gap: 15px;
+  margin: 0 auto;
 }
 
 .upload-music-list-container {
@@ -74,6 +75,11 @@ code {
 }
 
 @media (max-width: 768px) {
+
+  .upload-music-buttons-container {
+    gap: 10px;
+  }
+
   .main-screen-wrapper {
     padding: 8px 14px;
     gap: 15px;

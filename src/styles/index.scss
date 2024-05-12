@@ -42,7 +42,7 @@ code {
   display: flex;
   gap: 20px;
   overflow: hidden;
-  margin: 20px 50px;
+  padding: 20px 50px;
 }
 
 .upload-music-buttons-container {
@@ -62,22 +62,27 @@ code {
 
 
 @media (max-width: 1024px) {
+
+  body {
+    max-width: 1024px;
+  }
+
   .main-screen-wrapper {
-    margin: 10px 30px;
+    padding: 10px 30px;
     gap: 15px;
   }
 }
 
 @media (max-width: 768px) {
   .main-screen-wrapper {
-    margin: 8px 14px;
+    padding: 8px 14px;
     gap: 15px;
   }
 }
 
 @media (max-width: 580px) {
   .main-screen-wrapper {
-    margin: 4px 10px;
+    padding: 4px 10px;
     gap: 10px;
   }
 }

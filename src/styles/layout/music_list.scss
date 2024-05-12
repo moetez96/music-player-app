@@ -9,7 +9,7 @@
     overflow: auto;
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
-    width: 90%;
+    width: 100%;
     margin: 0 auto;
     &::-webkit-scrollbar {
         display: none;
@@ -17,7 +17,7 @@
 }
 
 .upload-music-icons-container {
-    width: 90%;
+    width: 100%;
     display: flex;
     justify-content: flex-end;
     gap: 10px;

@@ -22,3 +22,18 @@ input[type] {
         opacity: 1;
     }
 }
+
+@media (max-width: 768px) {
+
+    .search-bar-wrapper {
+        height: 80px;
+        padding-left: 18px;
+    }
+
+    input[type] {
+        background-color: transparent;
+        font-size: 12px;
+        color: white;
+        font-weight: 500;
+    }
+}

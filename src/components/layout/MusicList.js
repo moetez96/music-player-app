@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation to get current route
+import { useLocation } from 'react-router-dom';
 import "../../styles/layout/music_list.scss";
 import ScanForMusic from "../buttons/ScanForMusic";
 import UploadMusic from "../buttons/UploadMusic";

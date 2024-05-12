@@ -38,6 +38,7 @@ function MusicPlayer() {
   }, [currentTime]);
 
   useEffect(() => {
+    
     if (!repeat) {
       setIsPlaying(false);
     }

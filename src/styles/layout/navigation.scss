@@ -7,21 +7,43 @@
     background-color: #1A1E1F;
     position: relative;
 
-    > a:nth-child(1) {
+    >a:nth-child(1) {
         position: absolute;
         top: 10px;
         left: 3px;
     }
 
-    > a:nth-child(2) {
+    >a:nth-child(2) {
         position: absolute;
         top: 60px;
         left: 12px;
     }
-    
+
     svg:hover {
         cursor: pointer;
         border-radius: 40px;
         background-color: #252626;
+    }
+}
+
+@media (max-width: 580px) {
+    .nav-wrapper {
+        position: absolute;
+        width: 90px;
+        height: 40px;
+
+        >a:nth-child(1) {
+            top: -3px;
+            left: 5px;
+        }
+
+        >a:nth-child(2) {
+            top: 7px;
+            left: 55px;
+        }
+
+        svg:hover {
+            border-radius: 20px;
+        }
     }
 }

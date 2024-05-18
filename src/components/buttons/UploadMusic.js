@@ -1,7 +1,7 @@
 import React from "react";
 import UploadMusicIcon from "../icons/UploadMusicIcon";
 import jsmediatags from "jsmediatags-web";
-import { convertImageToBase64 } from "../../utils/Shared";
+import { convertImageToBase64, getAudioBuffer } from "../../utils/Shared";
 import {
   getAudioCover,
   saveAudioCoverToDB,
@@ -18,12 +18,7 @@ function UploadMusic() {
 
     if (file.type.startsWith("audio/")) {
       try {
-        const arrayBuffer = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsArrayBuffer(file);
-        });
+        const arrayBuffer = await getAudioBuffer(file);
 
         const tag = await new Promise((resolve, reject) => {
           jsmediatags.read(file, {

@@ -1,3 +1,5 @@
+import pako from 'pako';
+
 export function formatDuration(duration) {
     if (!duration) {
       return "--:--";
@@ -55,4 +57,16 @@ export async function convertImageToBase64(picture) {
 
   console.log(base64String);
   return base64String;
+}
+
+export async function getAudioBuffer(file) {
+  
+  const arrayBuffer = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+  });
+
+  return arrayBuffer;
 }

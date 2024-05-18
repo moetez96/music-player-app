@@ -29,6 +29,9 @@ body {
   max-height: 100vh;
   overflow: hidden;
   background-color: #1D2123;
+
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 code {

@@ -10,7 +10,11 @@ import { formatDuration } from "../utils/Shared";
 import RepeatIcon from "./icons/RepeatIcon";
 import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
-import { getAudioCover, refreshMusicList, selectTrack } from "../services/MusicDBService";
+import {
+  getAudioCover,
+  refreshMusicList,
+  selectTrack,
+} from "../services/MusicDBService";
 
 function MusicPlayer() {
   const initialValue = 50;
@@ -39,7 +43,6 @@ function MusicPlayer() {
   }, [currentTime]);
 
   useEffect(() => {
-
     if (!repeat) {
       setIsPlaying(false);
     }
@@ -58,7 +61,7 @@ function MusicPlayer() {
           setAllTracks(result.tracks);
           if (result.track) {
             setTrack(result.track);
-        
+
             fetchCoverPicture(result.track);
           }
           if (result.audioUrl) {
@@ -88,13 +91,13 @@ function MusicPlayer() {
 
   const fetchCoverPicture = async (track) => {
     const coverPicture = await getAudioCover(track);
-    if (coverPicture) {
-      setImage(
-        coverPicture 
-          ? coverPicture?.coverPicture ? coverPicture?.coverPicture : placeHolderImage
+    setImage(
+      coverPicture
+        ? coverPicture?.coverPicture
+          ? coverPicture?.coverPicture
           : placeHolderImage
-      );
-    }
+        : placeHolderImage
+    );
   };
 
   const handleInputChange = (event) => {
@@ -143,7 +146,7 @@ function MusicPlayer() {
     if (allTracks?.empty) {
       console.log("No tracks found");
     } else {
-      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);      
+      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
       if (shuffle) {
         var randomIndex;
         do {
@@ -151,7 +154,6 @@ function MusicPlayer() {
         } while (randomIndex === trackIndex);
 
         await selectTrack(allTracks[randomIndex]);
-      
       } else if (trackIndex !== -1 && trackIndex < allTracks?.length) {
         await selectTrack(allTracks[trackIndex + 1]);
       } else {
@@ -229,8 +231,8 @@ function MusicPlayer() {
         </div>
         <div className="music-playing-options">
           <div className="music-playing-buttons">
-          <span onClick={handleShuffle}>
-            <PlayRandomIcon isShuffle={shuffle}/>
+            <span onClick={handleShuffle}>
+              <PlayRandomIcon isShuffle={shuffle} />
             </span>
             <span onClick={previousTrack}>
               <SkipBackIcon
@@ -271,7 +273,7 @@ function MusicPlayer() {
         </div>
         <div className="music-playing-volume">
           <span onClick={changeVolume}>
-            <VolUpIcon value={value}/>
+            <VolUpIcon value={value} />
           </span>
           <input
             type="range"

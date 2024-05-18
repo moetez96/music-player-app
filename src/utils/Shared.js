@@ -1,5 +1,3 @@
-import pako from 'pako';
-
 export function formatDuration(duration) {
     if (!duration) {
       return "--:--";
@@ -11,7 +9,7 @@ export function formatDuration(duration) {
 }
 
 export async function convertImageToBase64(picture) {
-  const maxFileSizeKB = 80;
+  const maxFileSizeKB = 500;
 
   const createImage = (picture) => {
     return new Promise((resolve, reject) => {
@@ -60,7 +58,7 @@ export async function convertImageToBase64(picture) {
 }
 
 export async function getAudioBuffer(file) {
-  
+
   const arrayBuffer = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);

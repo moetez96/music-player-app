@@ -3,6 +3,12 @@ import EventEmitter from "./EventEmitter";
 
 const db = new Localbase("musicDB");
 
+
+const loadTracksFromDB = async () => {
+  const tracks = await db.collection("tracks").get();
+  return tracks;
+};
+
 const selectTrack = async (musicItem) => {
   try {
     const existingTrack = await db
@@ -190,6 +196,7 @@ const saveTrackToDB = async (track, arrayBuffer) => {
   };
 
 export {
+  loadTracksFromDB,
   selectTrack,
   getAllTracks,
   refreshMusicList,

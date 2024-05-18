@@ -2,11 +2,14 @@ import React from "react";
 import UploadMusicIcon from "../icons/UploadMusicIcon";
 import jsmediatags from "jsmediatags-web";
 import { convertImageToBase64 } from "../../utils/Shared";
-import { getAudioCover, saveAudioCoverToDB, saveTrackToDB } from "../../services/MusicDBService";
+import {
+  getAudioCover,
+  saveAudioCoverToDB,
+  saveTrackToDB,
+} from "../../services/MusicDBService";
 
 function UploadMusic() {
-
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
 
     if (!file) {
@@ -14,59 +17,68 @@ function UploadMusic() {
     }
 
     if (file.type.startsWith("audio/")) {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      reader.onload = (event) => {
-        const arrayBuffer = event.target.result;
-        jsmediatags.read(file, {
-          onSuccess(tag) {
-            if (!tag || !tag.tags) {
-              console.error("No tags found for the audio file.");
-              return;
-            }
+      try {
+        const arrayBuffer = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(file);
+        });
 
-            const cover = tag.tags.picture;
-            
-            const track = {
-              id: 0,
-              title: tag.tags.title || "Unknown",
-              artist: tag.tags.artist || "Unknown",
-              album: tag.tags.album || "Unknown",
-              duration: 0,
-              urlId: null,
-              addDate: Date.now(),
-              selected: false
-            };
+        const tag = await new Promise((resolve, reject) => {
+          jsmediatags.read(file, {
+            onSuccess: resolve,
+            onError: reject,
+          });
+        });
 
-            const audio = new Audio();
-            const url = URL.createObjectURL(file);
-            audio.src = url;
+        if (!tag || !tag.tags) {
+          console.error("No tags found for the audio file.");
+          return;
+        }
 
-            audio.addEventListener("loadedmetadata", async function () {
+        const cover = tag.tags.picture;
+
+        const track = {
+          id: 0,
+          title: tag.tags.title || "Unknown",
+          artist: tag.tags.artist || "Unknown",
+          album: tag.tags.album || "Unknown",
+          duration: 0,
+          urlId: null,
+          addDate: Date.now(),
+          selected: false,
+        };
+
+        const audio = new Audio();
+        const url = URL.createObjectURL(file);
+        audio.src = url;
+
+        await new Promise((resolve, reject) => {
+          audio.addEventListener("loadedmetadata", async function () {
+            try {
               track.duration = audio.duration || 0;
 
               if (cover) {
-                const coverPictureExists  = await getAudioCover(track);
+                const coverPictureExists = await getAudioCover(track);
                 if (!coverPictureExists) {
-                  const coverPic = convertImageToBase64(cover)
-
-                  await saveAudioCoverToDB(track, coverPic)
+                  const coverPic = await convertImageToBase64(cover);
+                  await saveAudioCoverToDB(track, coverPic);
                 }
-              } 
+              }
 
               await saveTrackToDB(track, arrayBuffer);
-            });
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          });
 
-            audio.load();
-          },
-          onError(error) {
-            console.error("Error reading file metadata:", error);
-          },
+          audio.load();
         });
-      };
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-      };
+      } catch (error) {
+        console.error("Error processing file:", error);
+      }
     } else {
       console.error("Invalid file type. Please select an Audio file.");
     }

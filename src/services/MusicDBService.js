@@ -133,6 +133,7 @@ const saveTrackToDB = async (track, arrayBuffer) => {
     const urlId = await saveUrlToDB(arrayBuffer);
     const uniqueId = await generateUniqueId("tracks");
     await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
+    EventEmitter.emit("tracksChanged");
   } catch (error) {
     console.error("Error saving track to IndexedDB:", error);
   }

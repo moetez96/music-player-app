@@ -31,8 +31,10 @@ function App() {
   useEffect(() => {
     if (coverPicture) {
       document.body.style.backgroundImage = `
-      linear-gradient(to top, rgba(29, 33, 35, 1) 40%,
-      rgba(29, 33, 35, 0.8) 70%, 
+      linear-gradient(to top, rgba(29, 33, 35, 1) 30%,
+      rgba(29, 33, 35, 0.9) 50%,
+      rgba(29, 33, 35, 0.85) 60%,
+      rgba(29, 33, 35, 0.79) 80%,
       rgba(29, 33, 35, 0.7) 100%),
       url(${coverPicture})`;
       document.body.style.backgroundSize = 'cover';

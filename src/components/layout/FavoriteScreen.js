@@ -1,7 +1,4 @@
-// MainScreen.js
 import React, { useEffect, useState } from "react";
-import UploadMusic from "../buttons/UploadMusic";
-import ScanForMusic from "../buttons/ScanForMusic";
 import MusicList from "./MusicList";
 import LocalBase from "localbase";
 import EventEmitter from "../../services/EventEmitter";

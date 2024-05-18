@@ -2,7 +2,7 @@
     width: 100%;
     min-height: 56px;
     border-radius: 66px;
-    background-color: rgba(51, 55, 59, 0.37);
+    background-color: rgba(51, 55, 59, 0.45);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -11,7 +11,7 @@
     transition: background-color 0.3s;
   
     &:hover {
-      background-color: rgba(51, 55, 59, 0.7);
+      background-color: rgba(51, 55, 59, 0.75);
     }
   
     span {
@@ -30,10 +30,10 @@
     }
   
     &.selected {
-      background-color: rgba(250, 205, 102, 0.37);
+      background-color: rgba(250, 205, 102, 0.45);
   
       &:hover {
-        background-color: rgba(250, 205, 102, 0.7);
+        background-color: rgba(250, 205, 102, 0.75);
       }
     }
   }

@@ -71,6 +71,7 @@ function MusicCard({ musicItem }) {
       </span>
       <p>{currentTrack?.title}</p>
       <p>{currentTrack?.album}</p>
+      <p>{currentTrack?.artist}</p>
       <p>{formatDuration(currentTrack?.duration)}</p>
       <span onClick={removeMusic} className="music-card-delete-icon">
         <DeleteIcon />

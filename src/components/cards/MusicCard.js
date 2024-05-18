@@ -1,5 +1,5 @@
 import "../../styles/components/cards.scss";
-import musicPlaceholder from "../../styles/assets/images/music_placeholder.jpg";
+import placeHolderImage from "../../styles/assets/images/music_placeholder.jpg";
 import HeartIcon from "../icons/HeartIcon";
 import DeleteIcon from "../icons/DeleteIcon";
 import EventEmitter from "../../services/EventEmitter";
@@ -8,6 +8,7 @@ import HeartIconRed from "../icons/HeartIconRed";
 import { useEffect, useState } from "react";
 import {
   deleteTrack,
+  getAudioCover,
   getFavorite,
   handleFavoriteTrack,
   selectTrack,
@@ -16,11 +17,22 @@ import {
 function MusicCard({ musicItem }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
-  const [image, setImage] = useState(musicPlaceholder);
+  const [image, setImage] = useState(placeHolderImage);
 
   useEffect(() => {
-    setCurrentTrack(musicItem);
-    setImage(musicItem.image);
+    setCurrentTrack(musicItem)
+    const fetchCoverPicture = async () => {
+      const coverPicture = await getAudioCover(musicItem);
+      if (coverPicture) {
+        setImage(
+          coverPicture 
+            ? coverPicture?.coverPicture ? coverPicture?.coverPicture : placeHolderImage
+            : placeHolderImage
+        );
+      }
+    };
+
+    fetchCoverPicture();
   }, [musicItem]);
 
   useEffect(() => {
@@ -52,11 +64,7 @@ function MusicCard({ musicItem }) {
       onClick={handleClick}
     >
       <span>
-        <img
-          src={image}
-          alt="music-card-img"
-          className="music-card-img"
-        />
+        <img src={image} alt="music-card-img" className="music-card-img" />
         <span onClick={handleFavorite} className="music-card-fav-icon">
           {isFavorite ? <HeartIconRed /> : <HeartIcon />}
         </span>

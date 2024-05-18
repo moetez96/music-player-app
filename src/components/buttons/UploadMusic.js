@@ -2,7 +2,7 @@ import React from "react";
 import UploadMusicIcon from "../icons/UploadMusicIcon";
 import jsmediatags from "jsmediatags-web";
 import { convertImageToBase64 } from "../../utils/Shared";
-import { saveTrackToDB } from "../../services/MusicDBService";
+import { getAudioCover, saveAudioCoverToDB, saveTrackToDB } from "../../services/MusicDBService";
 
 function UploadMusic() {
 
@@ -25,9 +25,7 @@ function UploadMusic() {
               return;
             }
 
-
-            var picture = tag.tags.picture;
-            const imageUri = convertImageToBase64(picture)
+            const cover = tag.tags.picture;
             
             const track = {
               id: 0,
@@ -37,8 +35,7 @@ function UploadMusic() {
               duration: 0,
               urlId: null,
               addDate: Date.now(),
-              selected: false,
-              image: imageUri
+              selected: false
             };
 
             const audio = new Audio();
@@ -47,6 +44,16 @@ function UploadMusic() {
 
             audio.addEventListener("loadedmetadata", async function () {
               track.duration = audio.duration || 0;
+
+              if (cover) {
+                const coverPictureExists  = await getAudioCover(track);
+                if (!coverPictureExists) {
+                  const coverPic = convertImageToBase64(cover)
+
+                  await saveAudioCoverToDB(track, coverPic)
+                }
+              } 
+
               await saveTrackToDB(track, arrayBuffer);
             });
 

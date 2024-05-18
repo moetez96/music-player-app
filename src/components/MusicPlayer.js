@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import placeHolderImage from "../../src/styles/assets/images/placeholder.png";
+import placeHolderImage from "../styles/assets/images/music_placeholder.jpg";
 import "../styles/components/musicPlayer.scss";
 import VolUpIcon from "./icons/VolUpIcon";
 import SkipFwdIcon from "./icons/SkipFwdIcon";
@@ -10,7 +10,7 @@ import { formatDuration } from "../utils/Shared";
 import RepeatIcon from "./icons/RepeatIcon";
 import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
-import { refreshMusicList, selectTrack } from "../services/MusicDBService";
+import { getAudioCover, refreshMusicList, selectTrack } from "../services/MusicDBService";
 
 function MusicPlayer() {
   const initialValue = 50;
@@ -58,12 +58,13 @@ function MusicPlayer() {
           setAllTracks(result.tracks);
           if (result.track) {
             setTrack(result.track);
+        
+            fetchCoverPicture(result.track);
           }
           if (result.audioUrl) {
             audioRef.current.src = result.audioUrl;
             audioRef.current.addEventListener("loadedmetadata", () => {
               setDuration(audioRef.current.duration);
-              setImage(result.track.image);
               if (firstMount) {
                 setFirstMount(false);
               }
@@ -84,6 +85,17 @@ function MusicPlayer() {
       EventEmitter.off("tracksChanged", updateMusicList);
     };
   }, []);
+
+  const fetchCoverPicture = async (track) => {
+    const coverPicture = await getAudioCover(track);
+    if (coverPicture) {
+      setImage(
+        coverPicture 
+          ? coverPicture?.coverPicture ? coverPicture?.coverPicture : placeHolderImage
+          : placeHolderImage
+      );
+    }
+  };
 
   const handleInputChange = (event) => {
     setValue(event.target.value);

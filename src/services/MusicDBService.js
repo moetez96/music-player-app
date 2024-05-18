@@ -120,25 +120,23 @@ const saveUrlToDB = async (arrayBuffer) => {
   }
 };
 
-  const saveTrackToDB = async (track) => {
-    try {
-      const existingTrack = await db
-        .collection("tracks")
-        .doc({ title: track.title, album: track.album, artist: track.artist})
-        .get();
-      if (existingTrack) {
-        console.log("Duplicate track found in IndexedDB:", track);
-        return;
-      }
-
-      const urlId = await saveUrlToDB(track.urlId);
-
-      await db.collection("tracks").add({ ...track, urlId: urlId });
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error saving track to IndexedDB:", error);
+const saveTrackToDB = async (track, arrayBuffer) => {
+  try {
+    const existingTrack = await db
+      .collection("tracks")
+      .doc({ title: track.title, album: track.album, artist: track.artist})
+      .get();
+    if (existingTrack) {
+      console.log("Duplicate track found in IndexedDB:", track);
+      return;
     }
-  };
+    const urlId = await saveUrlToDB(arrayBuffer);
+    const uniqueId = await generateUniqueId("tracks");
+    await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
+  } catch (error) {
+    console.error("Error saving track to IndexedDB:", error);
+  }
+};
 
   const saveTrackToDBScan = async (track) => {
     try {
@@ -160,6 +158,35 @@ const saveUrlToDB = async (arrayBuffer) => {
     }
   };
 
+  const getAudioCover = async (musicItem) => {
+    let query;
+  
+    if (musicItem.album.toLowerCase() === "unknown") {
+      query = { title: musicItem.title, artist: musicItem.artist };
+    } else {
+      query = { artist: musicItem.artist, album: musicItem.album };
+    }
+
+    console.log(query);
+
+    return await db.collection("audioCvr").doc(query).get();
+  };
+  
+
+  const saveAudioCoverToDB = async (musicItem, coverPic) => {
+    try {
+      const audioCvr = await db.collection("audioCvr").add({ 
+        title: musicItem.title, 
+        album: musicItem.album, 
+        artist: musicItem.artist,
+        coverPicture: coverPic
+      });
+      console.log(audioCvr);
+    } catch (error) {
+      console.error("Failed to save audioCvr to IndexedDB:", error);
+    }
+  };
+
 export {
   selectTrack,
   getAllTracks,
@@ -170,5 +197,7 @@ export {
   saveTrackToDB,
   saveUrlToDB,
   generateUniqueId,
-  saveTrackToDBScan
+  saveTrackToDBScan,
+  getAudioCover,
+  saveAudioCoverToDB
 };

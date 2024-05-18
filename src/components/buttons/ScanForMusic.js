@@ -1,7 +1,8 @@
 import { useState } from "react";
 import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 import jsmediatags from "jsmediatags-web";
-import { generateUniqueId, saveTrackToDBScan } from "../../services/MusicDBService";
+import { generateUniqueId, getAudioCover, saveAudioCoverToDB, saveTrackToDBScan } from "../../services/MusicDBService";
+import { convertImageToBase64 } from "../../utils/Shared";
 
 function ScanForMusic() {
   const [tracks, setTracks] = useState([]);
@@ -26,6 +27,7 @@ function ScanForMusic() {
               });
 
               const arrayBuffer = reader.result;
+              const cover = tag.tags.picture;
 
               const track = {
                 id: 0,
@@ -40,6 +42,16 @@ function ScanForMusic() {
 
               audio.addEventListener("loadedmetadata", async function () {
                 track.duration = audio.duration || 0;
+
+                if (cover) {
+                  const coverPictureExists  = await getAudioCover(track);
+                  if (!coverPictureExists) {
+                    const coverPic = convertImageToBase64(cover)
+  
+                    await saveAudioCoverToDB(track, coverPic)
+                  }
+                } 
+
                 resolve(track);
               });
 

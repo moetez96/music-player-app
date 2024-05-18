@@ -33,6 +33,7 @@ function UploadMusic() {
         }
 
         const cover = tag.tags.picture;
+        console.log(tag.tags.genre);
 
         const track = {
           id: 0,
@@ -43,6 +44,10 @@ function UploadMusic() {
           urlId: null,
           addDate: Date.now(),
           selected: false,
+          genre: tag.tags.genre || "Unknown",
+          composer: tag.tags["©wrt"]?.data || "Unknown",
+          releaseDate: tag.tags.year || "Unknown",
+          copyright: tag.tags["cprt"]?.data || "Unknown"
         };
 
         const audio = new Audio();

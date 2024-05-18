@@ -68,8 +68,8 @@ function App() {
         <div className="main-screen-wrapper">
           <Navigation />
           <Routes>
-            <Route path="/" element={<MainScreen musicList={musicList} />} />
-            <Route path="/favorites" element={<FavoriteScreen />} />
+            <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture}/>} />
+            <Route path="/favorites" element={<FavoriteScreen coverPicture={coverPicture} />} />
           </Routes>
         </div>
         <Footer />

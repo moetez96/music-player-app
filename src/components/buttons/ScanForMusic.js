@@ -26,6 +26,7 @@ function ScanForMusic() {
 
           const arrayBuffer = await getAudioBuffer(file);
           const cover = tag.tags.picture;
+          console.log(tag.tags);
           const track = {
             id: 0,
             title: tag.tags.title || "Unknown",
@@ -35,6 +36,11 @@ function ScanForMusic() {
             urlId: arrayBuffer,
             addDate: Date.now(),
             selected: false,
+            genre: tag.tags.genre || "Unknown",
+            composer: tag.tags["©wrt"]?.data || "Unknown",
+            releaseDate: tag.tags.year || "Unknown",
+            copyright: tag.tags["cprt"]?.data || "Unknown"
+
           };
 
           await new Promise((resolve, reject) => {

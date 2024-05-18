@@ -8,13 +8,51 @@ export function formatDuration(duration) {
     return minutes + ":" + remainingSeconds;
 }
 
-export function convertImageToBase64(picture)  {
-  var base64String = "";
-  for (var i = 0; i < picture.data.length; i++) {
-    base64String += String.fromCharCode(picture.data[i]);
-  }
-  var imageUri =
-    "data:" + picture.format + ";base64," + window.btoa(base64String);
+export async function convertImageToBase64(picture) {
+  const maxFileSizeKB = 80;
 
-  return imageUri
+  const createImage = (picture) => {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([new Uint8Array(picture.data)], { type: picture.format });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+      };
+      img.onerror = (error) => {
+        URL.revokeObjectURL(url);
+        reject(error);
+      };
+      img.src = url;
+    });
+  };
+
+  const img = await createImage(picture);
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  let width = img.width;
+  let height = img.height;
+
+  const maxDimension = Math.max(width, height);
+  const scale = Math.sqrt((maxFileSizeKB * 1024) / (maxDimension * maxDimension));
+  width *= scale;
+  height *= scale;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.drawImage(img, 0, 0, width, height);
+
+  let quality = 1.0;
+  let base64String;
+
+  do {
+    base64String = canvas.toDataURL(picture.format, quality);
+    quality -= 0.1;
+  } while (base64String.length > maxFileSizeKB * 1024 && quality > 0);
+
+  console.log(base64String);
+  return base64String;
 }

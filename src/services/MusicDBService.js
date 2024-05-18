@@ -150,8 +150,9 @@ const saveTrackToDB = async (track, arrayBuffer) => {
       }
 
       const urlId = await saveUrlToDB(track.urlId);
+      const uniqueId = await generateUniqueId("tracks");
 
-      await db.collection("tracks").add({ ...track, urlId: urlId });
+      await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
       EventEmitter.emit("tracksChanged");
     } catch (error) {
       console.error("Error saving track to IndexedDB:", error);
@@ -167,9 +168,9 @@ const saveTrackToDB = async (track, arrayBuffer) => {
       query = { artist: musicItem.artist, album: musicItem.album };
     }
 
-    console.log(query);
+    const coverPicture = await db.collection("audioCvr").doc(query).get();
 
-    return await db.collection("audioCvr").doc(query).get();
+    return coverPicture;
   };
   
 

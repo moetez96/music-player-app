@@ -1,87 +1,77 @@
-import { useState } from "react";
 import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 import jsmediatags from "jsmediatags-web";
-import { generateUniqueId, getAudioCover, saveAudioCoverToDB, saveTrackToDBScan } from "../../services/MusicDBService";
+import { getAudioCover, saveAudioCoverToDB, saveTrackToDBScan } from "../../services/MusicDBService";
 import { convertImageToBase64 } from "../../utils/Shared";
 
 function ScanForMusic() {
-  const [tracks, setTracks] = useState([]);
 
   const handleFileChange = async (event) => {
     const fileList = event.target.files;
     const fileListArray = Array.from(fileList);
 
-    const promises = fileListArray.map(async (file) => {
-      if (file.type.startsWith("audio/")) {
-        const reader = new FileReader();
-        const audio = new Audio();
+    for (const file of fileListArray) {
+        if (file.type.startsWith("audio/")) {
+            const reader = new FileReader();
+            const audio = new Audio();
 
-        return new Promise(async (resolve, reject) => {
-          reader.onload = async () => {
             try {
-              const tag = await new Promise((resolve, reject) => {
-                jsmediatags.read(file, {
-                  onSuccess: resolve,
-                  onError: reject,
+                const tag = await new Promise((resolve, reject) => {
+                    jsmediatags.read(file, {
+                        onSuccess: resolve,
+                        onError: reject,
+                    });
                 });
-              });
 
-              const arrayBuffer = reader.result;
-              const cover = tag.tags.picture;
+                const arrayBuffer = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(file);
+                });
 
-              const track = {
-                id: 0,
-                title: tag.tags.title || "Unknown",
-                artist: tag.tags.artist || "Unknown",
-                album: tag.tags.album || "Unknown",
-                duration: 0,
-                urlId: arrayBuffer,
-                addDate: Date.now(),
-                selected: false,
-              };
+                const cover = tag.tags.picture;
 
-              audio.addEventListener("loadedmetadata", async function () {
-                track.duration = audio.duration || 0;
+                const track = {
+                    id: 0,
+                    title: tag.tags.title || "Unknown",
+                    artist: tag.tags.artist || "Unknown",
+                    album: tag.tags.album || "Unknown",
+                    duration: 0,
+                    urlId: arrayBuffer,
+                    addDate: Date.now(),
+                    selected: false,
+                };
 
-                if (cover) {
-                  const coverPictureExists  = await getAudioCover(track);
-                  if (!coverPictureExists) {
-                    const coverPic = convertImageToBase64(cover)
-  
-                    await saveAudioCoverToDB(track, coverPic)
-                  }
-                } 
+                await new Promise((resolve, reject) => {
+                    audio.addEventListener("loadedmetadata", async function () {
+                        try {
+                            track.duration = audio.duration || 0;
 
-                resolve(track);
-              });
+                            if (cover) {
+                                const coverPictureExists = await getAudioCover(track);
+                                if (!coverPictureExists) {
+                                    const coverPic = await convertImageToBase64(cover);
+                                    await saveAudioCoverToDB(track, coverPic);
+                                }
+                            }
 
-              audio.src = URL.createObjectURL(file);
-              audio.load();
+                            await saveTrackToDBScan(track);
+                            resolve();
+                        } catch (error) {
+                            reject(error);
+                        }
+                    });
+
+                    audio.src = URL.createObjectURL(file);
+                    audio.load();
+                });
             } catch (error) {
-              console.error("Error reading file metadata:", error);
-              resolve(null);
+                console.error("Error processing file:", error);
             }
-          };
-          reader.readAsArrayBuffer(file);
-        });
-      } else {
-        return null;
-      }
-    });
+        }
+    }
 
-    const processedTracks = await Promise.all(promises);
-    const filteredTracks = processedTracks.filter((track) => track !== null);
+};
 
-    const tracksWithUniqueIds = await Promise.all(
-      filteredTracks.map(async (track) => ({
-        ...track,
-        id: await generateUniqueId("tracks",),
-      }))
-    );
-
-    setTracks([...tracks, ...tracksWithUniqueIds]);
-    tracksWithUniqueIds.forEach(saveTrackToDBScan);
-  };
 
   return (
     <>

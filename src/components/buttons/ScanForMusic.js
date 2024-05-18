@@ -1,54 +1,10 @@
 import { useState } from "react";
 import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 import jsmediatags from "jsmediatags-web";
-import LocalBase from "localbase";
-import EventEmitter from "../../services/EventEmitter";
+import { generateUniqueId, saveTrackToDBScan } from "../../services/MusicDBService";
 
 function ScanForMusic() {
   const [tracks, setTracks] = useState([]);
-  const db = new LocalBase("musicDB");
-
-  const generateUniqueId = async (collection) => {
-    let uniqueId;
-    let existingTrack;
-    do {
-      uniqueId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(
-        36
-      );
-      existingTrack = await db.collection(collection).doc({ id: uniqueId }).get();
-    } while (existingTrack);
-    return uniqueId;
-  };
-
-  const saveUrlToDB = async (arrayBuffer) => {
-    try {
-      const id = await generateUniqueId("audioUrls");
-      const urlId = await db.collection("audioUrls").add({ id:id, arrayBuffer: arrayBuffer });
-      return urlId.data.data.id;
-    } catch (error) {
-      console.error("Failed to save URL to IndexedDB:", error);
-    }
-  };
-
-  const saveTrackToDB = async (track) => {
-    try {
-      const existingTrack = await db
-        .collection("tracks")
-        .doc({ title: track.title, album: track.album, artist: track.artist})
-        .get();
-      if (existingTrack) {
-        console.log("Duplicate track found in IndexedDB:", track);
-        return;
-      }
-
-      const urlId = await saveUrlToDB(track.urlId);
-
-      await db.collection("tracks").add({ ...track, urlId: urlId });
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error saving track to IndexedDB:", error);
-    }
-  };
 
   const handleFileChange = async (event) => {
     const fileList = event.target.files;
@@ -70,7 +26,6 @@ function ScanForMusic() {
               });
 
               const arrayBuffer = reader.result;
-
 
               const track = {
                 id: 0,
@@ -113,7 +68,7 @@ function ScanForMusic() {
     );
 
     setTracks([...tracks, ...tracksWithUniqueIds]);
-    tracksWithUniqueIds.forEach(saveTrackToDB);
+    tracksWithUniqueIds.forEach(saveTrackToDBScan);
   };
 
   return (

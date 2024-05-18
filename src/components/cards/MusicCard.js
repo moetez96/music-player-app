@@ -16,9 +16,11 @@ import {
 function MusicCard({ musicItem }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
+  const [image, setImage] = useState(musicPlaceholder);
 
   useEffect(() => {
     setCurrentTrack(musicItem);
+    setImage(musicItem.image);
   }, [musicItem]);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ function MusicCard({ musicItem }) {
     >
       <span>
         <img
-          src={musicPlaceholder}
+          src={image}
           alt="music-card-img"
           className="music-card-img"
         />

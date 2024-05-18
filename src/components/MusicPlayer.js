@@ -24,6 +24,7 @@ function MusicPlayer() {
   const [shuffle, setShuffle] = useState(false);
   const [firstMount, setFirstMount] = useState(true);
   const [allTracks, setAllTracks] = useState([]);
+  const [image, setImage] = useState(placeHolderImage);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-volume", value);
@@ -62,7 +63,7 @@ function MusicPlayer() {
             audioRef.current.src = result.audioUrl;
             audioRef.current.addEventListener("loadedmetadata", () => {
               setDuration(audioRef.current.duration);
-
+              setImage(result.track.image);
               if (firstMount) {
                 setFirstMount(false);
               }
@@ -207,7 +208,7 @@ function MusicPlayer() {
       <div className="music-playing-container">
         <div className="music-playing-image-container">
           <div className="music-playing-image">
-            <img src={placeHolderImage} alt="cover" />
+            <img src={image} alt="cover" />
           </div>
           <div className="music-playing-shdes">
             <p className="music-playing-title">{track ? track.title : ""}</p>

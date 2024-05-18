@@ -98,6 +98,68 @@ const getFavorite = async (musicItem) => {
     .get();
 };
 
+const generateUniqueId = async (collection) => {
+  let uniqueId;
+  let existingTrack;
+  do {
+    uniqueId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(
+      36
+    );
+    existingTrack = await db.collection(collection).doc({ id: uniqueId }).get();
+  } while (existingTrack);
+  return uniqueId;
+};
+
+const saveUrlToDB = async (arrayBuffer) => {
+  try {
+    const id = await generateUniqueId("audioUrls");
+    const urlId = await db.collection("audioUrls").add({ id:id, arrayBuffer: arrayBuffer });
+    return urlId.data.data.id;
+  } catch (error) {
+    console.error("Failed to save URL to IndexedDB:", error);
+  }
+};
+
+  const saveTrackToDB = async (track) => {
+    try {
+      const existingTrack = await db
+        .collection("tracks")
+        .doc({ title: track.title, album: track.album, artist: track.artist})
+        .get();
+      if (existingTrack) {
+        console.log("Duplicate track found in IndexedDB:", track);
+        return;
+      }
+
+      const urlId = await saveUrlToDB(track.urlId);
+
+      await db.collection("tracks").add({ ...track, urlId: urlId });
+      EventEmitter.emit("tracksChanged");
+    } catch (error) {
+      console.error("Error saving track to IndexedDB:", error);
+    }
+  };
+
+  const saveTrackToDBScan = async (track) => {
+    try {
+      const existingTrack = await db
+        .collection("tracks")
+        .doc({ title: track.title, album: track.album, artist: track.artist})
+        .get();
+      if (existingTrack) {
+        console.log("Duplicate track found in IndexedDB:", track);
+        return;
+      }
+
+      const urlId = await saveUrlToDB(track.urlId);
+
+      await db.collection("tracks").add({ ...track, urlId: urlId });
+      EventEmitter.emit("tracksChanged");
+    } catch (error) {
+      console.error("Error saving track to IndexedDB:", error);
+    }
+  };
+
 export {
   selectTrack,
   getAllTracks,
@@ -105,4 +167,8 @@ export {
   deleteTrack,
   handleFavoriteTrack,
   getFavorite,
+  saveTrackToDB,
+  saveUrlToDB,
+  generateUniqueId,
+  saveTrackToDBScan
 };

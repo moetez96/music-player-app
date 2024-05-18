@@ -1,23 +1,10 @@
 import React from "react";
 import UploadMusicIcon from "../icons/UploadMusicIcon";
 import jsmediatags from "jsmediatags-web";
-import LocalBase from "localbase";
-import EventEmitter from "../../services/EventEmitter";
+import { convertImageToBase64 } from "../../utils/Shared";
+import { saveTrackToDB } from "../../services/MusicDBService";
 
 function UploadMusic() {
-  const db = new LocalBase("musicDB");
-
-  const generateUniqueId = async (collection) => {
-    let uniqueId;
-    let existingTrack;
-    do {
-      uniqueId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(
-        36
-      );
-      existingTrack = await db.collection(collection).doc({ id: uniqueId }).get();
-    } while (existingTrack);
-    return uniqueId;
-  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -38,6 +25,10 @@ function UploadMusic() {
               return;
             }
 
+
+            var picture = tag.tags.picture;
+            const imageUri = convertImageToBase64(picture)
+            
             const track = {
               id: 0,
               title: tag.tags.title || "Unknown",
@@ -47,6 +38,7 @@ function UploadMusic() {
               urlId: null,
               addDate: Date.now(),
               selected: false,
+              image: imageUri
             };
 
             const audio = new Audio();
@@ -55,7 +47,7 @@ function UploadMusic() {
 
             audio.addEventListener("loadedmetadata", async function () {
               track.duration = audio.duration || 0;
-              saveTrackToDB(track, arrayBuffer);
+              await saveTrackToDB(track, arrayBuffer);
             });
 
             audio.load();
@@ -70,35 +62,6 @@ function UploadMusic() {
       };
     } else {
       console.error("Invalid file type. Please select an Audio file.");
-    }
-  };
-
-  const saveUrlToDB = async (arrayBuffer) => {
-    try {
-      const id = await generateUniqueId("audioUrls");
-      const urlId = await db.collection("audioUrls").add({ id:id, arrayBuffer: arrayBuffer });
-      return urlId.data.data.id;
-    } catch (error) {
-      console.error("Failed to save URL to IndexedDB:", error);
-    }
-  };
-
-  const saveTrackToDB = async (track, arrayBuffer) => {
-    try {
-      const existingTrack = await db
-        .collection("tracks")
-        .doc({ title: track.title, album: track.album, artist: track.artist})
-        .get();
-      if (existingTrack) {
-        console.log("Duplicate track found in IndexedDB:", track);
-        return;
-      }
-      const urlId = await saveUrlToDB(arrayBuffer);
-      const uniqueId = await generateUniqueId("tracks");
-      await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error saving track to IndexedDB:", error);
     }
   };
 

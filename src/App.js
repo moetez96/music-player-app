@@ -62,6 +62,10 @@ function App() {
     }
   }
 
+  const updateOverView = (newState) => {
+      setOverView(newState);
+  };
+
   return (
     <Router>
       <>
@@ -69,11 +73,11 @@ function App() {
         <div className="main-screen-wrapper">
           <Navigation />
           <Routes>
-            <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture}/>} overView={overView}/>
+            <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>}/>
             <Route path="/favorites" element={<FavoriteScreen coverPicture={coverPicture} />} />
           </Routes>
         </div>
-        <Footer />
+        <Footer overView={overView} updateOverView={updateOverView}/>
       </>
     </Router>
   );

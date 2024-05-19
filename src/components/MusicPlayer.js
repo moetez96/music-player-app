@@ -16,7 +16,7 @@ import {
   selectTrack,
 } from "../services/MusicDBService";
 
-function MusicPlayer() {
+function MusicPlayer({overView, updateOverView}) {
   const initialValue = 50;
   const [value, setValue] = useState(initialValue);
   const [currentTime, setCurrentTime] = useState(0);
@@ -209,6 +209,10 @@ function MusicPlayer() {
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
+  const handleOverViewClick = () => {
+    updateOverView(!overView);
+  };
+
   return (
     <div className="player-wrapper">
       <div>
@@ -220,7 +224,7 @@ function MusicPlayer() {
         />
       </div>
       <div className="music-playing-container">
-        <div className="music-playing-image-container">
+        <div className="music-playing-image-container" onClick={handleOverViewClick}>
           <div className="music-playing-image">
             <img src={image} alt="cover" />
           </div>

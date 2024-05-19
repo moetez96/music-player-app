@@ -42,55 +42,58 @@ function MusicList({ musicList, coverPicture, overView }) {
   return (
     <div className="music-list-wrapper">
       {overView ? (
-        <div className="music-playing-overview-container">
+        <>
           <div className="music-playing-overview-background"></div>
-          <img
-            className="music-playing-overview-img"
-            src={coverPicture ? coverPicture : placeHolderImage}
-            alt="overview-img"
-          />
-          <div className="music-playing-overview-desc">
-            {currentTrack?.title && currentTrack?.title !== "Unknown" ? (
-              <span className="overview-title">{currentTrack?.title}</span>
-            ) : (
-              <></>
-            )}
-            {currentTrack?.artist && currentTrack?.artist !== "Unknown" ? (
-              <p className="overview-artist">{currentTrack?.artist}</p>
-            ) : (
-              <></>
-            )}
-            {currentTrack?.album && currentTrack?.album !== "Unknown" ? (
-              <p className="overview-album">{currentTrack?.album}</p>
-            ) : (
-              <></>
-            )}
-            {currentTrack?.genre && currentTrack?.genre !== "Unknown" ? (
-              <p className="overview-genre">{currentTrack?.genre}</p>
-            ) : (
-              <></>
-            )}
-            {currentTrack?.composer && currentTrack?.composer !== "Unknown" ? (
-              <p className="overview-composer">{currentTrack?.composer}</p>
-            ) : (
-              <></>
-            )}
-            {currentTrack?.releaseDate &&
-            currentTrack?.releaseDate !== "Unknown" ? (
-              <p className="overview-releaseDate">
-                {currentTrack?.releaseDate}
-              </p>
-            ) : (
-              <></>
-            )}
-            {currentTrack?.copyright &&
-            currentTrack?.copyright !== "Unknown" ? (
-              <p className="overview-copyright">{currentTrack?.copyright}</p>
-            ) : (
-              <></>
-            )}
+          <div className="music-playing-overview-container">
+            <img
+              className="music-playing-overview-img"
+              src={coverPicture ? coverPicture : placeHolderImage}
+              alt="overview-img"
+            />
+            <div className="music-playing-overview-desc">
+              {currentTrack?.title && currentTrack?.title !== "Unknown" ? (
+                <span className="overview-title">{currentTrack?.title}</span>
+              ) : (
+                <></>
+              )}
+              {currentTrack?.artist && currentTrack?.artist !== "Unknown" ? (
+                <p className="overview-artist">{currentTrack?.artist}</p>
+              ) : (
+                <></>
+              )}
+              {currentTrack?.album && currentTrack?.album !== "Unknown" ? (
+                <p className="overview-album">{currentTrack?.album}</p>
+              ) : (
+                <></>
+              )}
+              {currentTrack?.genre && currentTrack?.genre !== "Unknown" ? (
+                <p className="overview-genre">{currentTrack?.genre}</p>
+              ) : (
+                <></>
+              )}
+              {currentTrack?.composer &&
+              currentTrack?.composer !== "Unknown" ? (
+                <p className="overview-composer">{currentTrack?.composer}</p>
+              ) : (
+                <></>
+              )}
+              {currentTrack?.releaseDate &&
+              currentTrack?.releaseDate !== "Unknown" ? (
+                <p className="overview-releaseDate">
+                  {currentTrack?.releaseDate}
+                </p>
+              ) : (
+                <></>
+              )}
+              {currentTrack?.copyright &&
+              currentTrack?.copyright !== "Unknown" ? (
+                <p className="overview-copyright">{currentTrack?.copyright}</p>
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <></>
       )}

@@ -74,7 +74,7 @@ function App() {
           <Navigation />
           <Routes>
             <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>}/>
-            <Route path="/favorites" element={<FavoriteScreen coverPicture={coverPicture} />} />
+            <Route path="/favorites" element={<FavoriteScreen coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>} />
           </Routes>
         </div>
         <Footer overView={overView} updateOverView={updateOverView}/>

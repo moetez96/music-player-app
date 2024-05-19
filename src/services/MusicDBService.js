@@ -3,7 +3,6 @@ import EventEmitter from "./EventEmitter";
 
 const db = new Localbase("musicDB");
 
-
 const loadTracksFromDB = async () => {
   const tracks = await db.collection("tracks").get();
   return tracks;
@@ -108,9 +107,7 @@ const generateUniqueId = async (collection) => {
   let uniqueId;
   let existingTrack;
   do {
-    uniqueId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(
-      36
-    );
+    uniqueId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36);
     existingTrack = await db.collection(collection).doc({ id: uniqueId }).get();
   } while (existingTrack);
   return uniqueId;
@@ -119,7 +116,9 @@ const generateUniqueId = async (collection) => {
 const saveUrlToDB = async (arrayBuffer) => {
   try {
     const id = await generateUniqueId("audioUrls");
-    const urlId = await db.collection("audioUrls").add({ id:id, arrayBuffer: arrayBuffer });
+    const urlId = await db
+      .collection("audioUrls")
+      .add({ id: id, arrayBuffer: arrayBuffer });
     return urlId.data.data.id;
   } catch (error) {
     console.error("Failed to save URL to IndexedDB:", error);
@@ -130,7 +129,7 @@ const saveTrackToDB = async (track, arrayBuffer) => {
   try {
     const existingTrack = await db
       .collection("tracks")
-      .doc({ title: track.title, album: track.album, artist: track.artist})
+      .doc({ title: track.title, album: track.album, artist: track.artist })
       .get();
     if (existingTrack) {
       console.log("Duplicate track found in IndexedDB:", track);
@@ -145,55 +144,64 @@ const saveTrackToDB = async (track, arrayBuffer) => {
   }
 };
 
-  const saveTrackToDBScan = async (track) => {
-    try {
-      const existingTrack = await db
-        .collection("tracks")
-        .doc({ title: track.title, album: track.album, artist: track.artist})
-        .get();
-      if (existingTrack) {
-        console.log("Duplicate track found in IndexedDB:", track);
-        return;
-      }
-
-      const urlId = await saveUrlToDB(track.urlId);
-      const uniqueId = await generateUniqueId("tracks");
-
-      await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
-      EventEmitter.emit("tracksChanged");
-    } catch (error) {
-      console.error("Error saving track to IndexedDB:", error);
-    }
-  };
-
-  const getAudioCover = async (musicItem) => {
-    let query;
-  
-    if (musicItem.album.toLowerCase() === "unknown") {
-      query = { title: musicItem.title, artist: musicItem.artist };
-    } else {
-      query = { artist: musicItem.artist, album: musicItem.album };
+const saveTrackToDBScan = async (track) => {
+  try {
+    const existingTrack = await db
+      .collection("tracks")
+      .doc({ title: track.title, album: track.album, artist: track.artist })
+      .get();
+    if (existingTrack) {
+      console.log("Duplicate track found in IndexedDB:", track);
+      return;
     }
 
-    const coverPicture = await db.collection("audioCvr").doc(query).get();
+    const urlId = await saveUrlToDB(track.urlId);
+    const uniqueId = await generateUniqueId("tracks");
 
-    return coverPicture;
-  };
-  
+    await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
+    EventEmitter.emit("tracksChanged");
+  } catch (error) {
+    console.error("Error saving track to IndexedDB:", error);
+  }
+};
 
-  const saveAudioCoverToDB = async (musicItem, coverPic) => {
-    try {
-      const audioCvr = await db.collection("audioCvr").add({ 
-        title: musicItem.title, 
-        album: musicItem.album, 
-        artist: musicItem.artist,
-        coverPicture: coverPic
-      });
-      console.log(audioCvr);
-    } catch (error) {
-      console.error("Failed to save audioCvr to IndexedDB:", error);
-    }
-  };
+const getAudioCover = async (musicItem) => {
+  let query;
+
+  if (musicItem.album.toLowerCase() === "unknown") {
+    query = { title: musicItem.title, artist: musicItem.artist };
+  } else {
+    query = { artist: musicItem.artist, album: musicItem.album };
+  }
+
+  const coverPicture = await db.collection("audioCvr").doc(query).get();
+
+  return coverPicture;
+};
+
+const saveAudioCoverToDB = async (musicItem, coverPic) => {
+  try {
+    const audioCvr = await db.collection("audioCvr").add({
+      title: musicItem.title,
+      album: musicItem.album,
+      artist: musicItem.artist,
+      coverPicture: coverPic,
+    });
+    console.log(audioCvr);
+  } catch (error) {
+    console.error("Failed to save audioCvr to IndexedDB:", error);
+  }
+};
+
+const loadFavoriteTracksFromDB = async () => {
+  const favorites = (await db.collection("favoriteTracks").get()).map(
+    (fav) => fav.favoriteId
+  );
+  const tracks = (await db.collection("tracks").get()).filter((track) =>
+    favorites.includes(track.id)
+  );
+  return tracks;
+};
 
 export {
   loadTracksFromDB,
@@ -208,5 +216,6 @@ export {
   generateUniqueId,
   saveTrackToDBScan,
   getAudioCover,
-  saveAudioCoverToDB
+  saveAudioCoverToDB,
+  loadFavoriteTracksFromDB,
 };

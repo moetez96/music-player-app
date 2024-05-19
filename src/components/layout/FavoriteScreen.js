@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import MusicList from "./MusicList";
-import LocalBase from "localbase";
 import EventEmitter from "../../services/EventEmitter";
+import { loadFavoriteTracksFromDB } from "../../services/MusicDBService";
 
-function FavoriteScreen() {
+function FavoriteScreen({coverPicture, overView, updateOverView}) {
   const [musicList, setMusicList] = useState([]);
-  const db = new LocalBase("musicDB");
 
   useEffect(() => {
     loadTracksFromDB();
@@ -18,8 +17,7 @@ function FavoriteScreen() {
   }, []);
 
   const loadTracksFromDB = async () => {
-    const favorites = (await db.collection("favoriteTracks").get()).map((fav) => fav.favoriteId);
-    const tracks = (await db.collection("tracks").get()).filter((track) => favorites.includes(track.id));
+    const tracks = await loadFavoriteTracksFromDB();
     setMusicList(tracks);
   };
 
@@ -27,7 +25,7 @@ function FavoriteScreen() {
     <>
       {musicList.length !== 0 ? (
         <div className="upload-music-list-container">
-          <MusicList musicList={musicList} />
+          <MusicList musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>
         </div>
       ) : (
         <div className="upload-music-buttons-container">

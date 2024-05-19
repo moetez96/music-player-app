@@ -110,11 +110,11 @@ function MusicList({ musicList, coverPicture, overView }) {
       {musicList.length === 0 ? (
         <></>
       ) : (
-        <>
-          {musicList.map((musicItem, index) => (
+        <div className="music-list-container">
+        {musicList.map((musicItem, index) => (
             <MusicCard key={index} musicItem={musicItem} />
           ))}
-        </>
+        </div>
       )}
     </div>
   );

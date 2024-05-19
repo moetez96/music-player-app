@@ -41,7 +41,7 @@ code {
 
 .main-screen-wrapper {
   min-width: 100%;
-  height: 90vh;
+  min-height: 100%;
   display: flex;
   gap: 10px;
   overflow: hidden;

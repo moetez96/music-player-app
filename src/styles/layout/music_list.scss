@@ -1,4 +1,15 @@
+ 
  .music-list-wrapper {
+     display: flex;
+     flex-direction: column;
+     justify-content: flex-start;
+     height: 100vh;
+     padding-bottom: 150px;
+     gap: 20px;
+     min-width: 100%;
+}
+
+ .music-list-container {
      display: flex;
      flex-direction: column;
      justify-content: flex-start;

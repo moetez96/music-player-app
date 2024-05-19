@@ -11,6 +11,7 @@ import { getAudioCover, loadTracksFromDB } from './services/MusicDBService';
 function App() {
   const [musicList, setMusicList] = useState([]);
   const [coverPicture, setCoverPicture] = useState(null);
+  const [overView, setOverView] = useState(false);
 
   useEffect(() => {
     fetchAndSetTracks();  
@@ -68,7 +69,7 @@ function App() {
         <div className="main-screen-wrapper">
           <Navigation />
           <Routes>
-            <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture}/>} />
+            <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture}/>} overView={overView}/>
             <Route path="/favorites" element={<FavoriteScreen coverPicture={coverPicture} />} />
           </Routes>
         </div>

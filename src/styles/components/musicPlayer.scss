@@ -33,6 +33,8 @@
 .music-playing-image-container {
     display: flex;
     gap: 10px;
+    cursor: pointer;
+    width: fit-content;
 }
 
 .music-playing-image {

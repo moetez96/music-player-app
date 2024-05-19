@@ -7,22 +7,40 @@ import MusicCard from "../cards/MusicCard";
 import placeHolderImage from "../../styles/assets/images/music_placeholder.jpg";
 
 function MusicList({ musicList, coverPicture }) {
-  const [currentTrack, setCurrentTrack] = useState(null)
+  const [currentTrack, setCurrentTrack] = useState(null);
   const location = useLocation();
-  
 
   useEffect(() => {
     const index = musicList.findIndex((item) => item.selected);
     if (index !== -1) {
-        setCurrentTrack(musicList[index])
+      setCurrentTrack(musicList[index]);
     }
   }, [musicList]);
+
+  useEffect(() => {
+    if (coverPicture && currentTrack) {
+      const element = document.querySelector('.music-playing-overview-background');
+
+      if (element) {
+        element.style.backgroundImage = `
+        linear-gradient(to top, rgba(29, 33, 35, 1) 30%,
+        rgba(29, 33, 35, 0.9) 50%,
+        rgba(29, 33, 35, 0.85) 60%,
+        rgba(29, 33, 35, 0.79) 80%,
+        rgba(29, 33, 35, 0.7) 100%),
+        url(${coverPicture})`;
+        element.style.backgroundSize = 'cover';
+        element.style.backgroundPosition = 'center';
+      }
+    } 
+  }, [currentTrack, coverPicture]);
 
   const isFavoritesRoute = location.pathname === "/favorites";
 
   return (
     <div className="music-list-wrapper">
       <div className="music-playing-overview-container">
+        <div className="music-playing-overview-background"></div>
         <img
           className="music-playing-overview-img"
           src={coverPicture ? coverPicture : placeHolderImage}

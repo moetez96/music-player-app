@@ -14,6 +14,8 @@
     background-color: transparent;
     max-width: 1920px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .music-playing-container {
@@ -24,8 +26,9 @@
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     align-items: center;
     padding: 0 20px;
+    position: relative;
+    z-index: 2;
 }
-
 
 .music-playing-image-container {
     display: flex;
@@ -120,13 +123,11 @@
         position: relative;
         z-index: 1;
         transform: translateY(-40%);
-
     }
 
     &::-moz-range-thumb {
         width: 1.25rem;
         height: 1.25rem;
-
     }
 }
 
@@ -153,7 +154,6 @@
         appearance: none;
         width: 1.5rem;
         height: 1.5rem;
-
     }
 
     &::-moz-range-thumb {
@@ -164,11 +164,6 @@
 
 .music-playing-timer {
     margin-top: 10px;
-    font-size: 14px;
-    color: #FFFFFF;
-}
-
-.music-playing-timer {
     font-size: 14px;
     color: #FFFFFF;
 }
@@ -219,7 +214,11 @@
 @media (max-width: 768px) {
 
     .music-playing-container {
-        position: relative;
+        position: absolute;
+        z-index: 10;
+        bottom: 0;
+        left: 0;
+        right: 0;
         display: block;
         grid-template-columns: none;
         align-items: none;
@@ -229,6 +228,7 @@
 
     .music-playing-image-container {
         position: absolute;
+        z-index: 5;
         top: 24px;
         left: 8px;
         width: fit-content;
@@ -244,23 +244,24 @@
 
     .music-playing-volume {
         position: absolute;
+        z-index: 5;
         top: 24px;
         right: 8px;
     }
-    
+
     .music-volume-sliders {
         display: none;
     }
-    
+
     .music-playing-options {
         display: flex;
         gap: 1px;
         justify-content: flex-end;
         position: absolute;
+        z-index: 5;
         bottom: 0;
         right: 0;
         width: 100%;
-
     }
 
     .music-playing-timer {
@@ -269,6 +270,7 @@
 
     .music-playing-sliders {
         position: absolute;
+        z-index: 5;
         left: 0;
         right: 0;
         bottom: 0;
@@ -279,15 +281,16 @@
             height: 0.75rem;
             border: 1px solid #FACD66;
         }
-    
+
         &::-moz-range-thumb {
             width: 1rem;
             height: 1rem;
-    
         }
     }
 
     .music-playing-buttons {
+        position: absolute;
+        z-index: 5;
         width: 100%;
         display: flex;
         padding: 0 10px;

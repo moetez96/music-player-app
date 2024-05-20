@@ -81,7 +81,7 @@ function App() {
   return (
     <Router>
       <>
-        <Header searchSetTracks={searchSetTracks} searchText={searchText}/>
+        <Header musicList={musicList} searchSetTracks={searchSetTracks} searchText={searchText}/>
         <div className="main-screen-wrapper">
           <Navigation handleNavigationChange={handleNavigationChange}/>
           <Routes>

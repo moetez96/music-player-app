@@ -1,179 +1,259 @@
 .music-card {
-    width: 100%;
-    min-height: 56px;
-    border-radius: 66px;
-    background-color: rgba(51, 55, 59, 0.45);
-    cursor: pointer;
+  width: 100%;
+  min-height: 56px;
+  border-radius: 66px;
+  background-color: rgba(51, 55, 59, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3%;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: rgba(51, 55, 59, 0.75);
+  }
+
+  span {
+    width: max-content;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 3%;
-    transition: background-color 0.3s;
-  
+    gap: 50px;
+  }
+
+  p {
+    width: 14%;
+    display: flex;
+    font-size: 14px;
+    color: #FFFFFF;
+  }
+
+  &.selected {
+    background-color: rgba(250, 205, 102, 0.45);
+
     &:hover {
-      background-color: rgba(51, 55, 59, 0.75);
+      background-color: rgba(250, 205, 102, 0.75);
+    }
+  }
+}
+
+
+.search-card {
+  width: 100%;
+  min-height: 35px;
+  border-radius: 50px;
+  background-color: rgba(51, 55, 59, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3%;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: rgba(51, 55, 59, 0.75);
+  }
+  
+  p{
+    width: 50px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #FFFFFF;
+  }
+
+  span {
+    width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    p{
+      width: 160px;
+    }
+    
+  }
+
+  &.selected {
+    background-color: rgba(250, 205, 102, 0.45);
+
+    &:hover {
+      background-color: rgba(250, 205, 102, 0.75);
+    }
+  }
+
+}
+
+.search-card-img {
+  height: 28px;
+  width: 28px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.music-card-img {
+  height: 39px;
+  width: 39px;
+  border-radius: 8.53px;
+  overflow: hidden;
+}
+
+
+@media (max-width: 1024px) {
+  .music-card {
+    min-height: 50px;
+
+    span {
+      gap: 20px;
     }
   
+    p {
+      width: 16%;
+      font-size: 13px;
+    }
+  }
+
+  .music-card-img {
+    height: 35px;
+    width: 35px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .music-card {
+    border-radius: 10px;
+    position: relative;
+    justify-content: none;
+    gap: 10px;
+
+    p {
+      font-size: 12px;
+    }
+
     span {
       width: max-content;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 50px;
-    }
-  
-    p {
-      width: 14%;
-      display: flex;
-      font-size: 14px;
-      color: #FFFFFF;
-    }
-  
-    &.selected {
-      background-color: rgba(250, 205, 102, 0.45);
-  
-      &:hover {
-        background-color: rgba(250, 205, 102, 0.75);
-      }
+      gap: 20px;
     }
   }
-  
+
   .music-card-img {
-    height: 39px;
-    width: 39px;
-    border-radius: 8.53px;
-    overflow: hidden;
+    height: 33px;
+    width: 33px;
   }
-  
-
-  @media (max-width: 1024px) {
-    .music-card {
-      min-height: 50px;
-
-      span {
-        gap: 20px;
-      }
-    
-      p {
-        width: 16%;
-        font-size: 13px;
-      }
-    }
-
-    .music-card-img {
-      height: 35px;
-      width: 35px;
-    }
-  }
-
-  @media (max-width: 768px) {
-
-    .music-card {
-      border-radius: 10px;
-      position: relative;
-      justify-content: none;
-      gap: 10px;
-
-      p {
-        font-size: 12px;
-      }
-
-      span {
-        width: max-content;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-      }
-    }
-
-    .music-card-img {
-      height: 33px;
-      width: 33px;
-    }
 }
 
-  @media (max-width: 580px) {
+@media (max-width: 580px) {
 
-    .music-card {
-      p {
-        width: 35%;
-        font-size: 12px;
-        overflow: hidden;
-        white-space: nowrap;
-      }
-
-      > p:nth-child(2) {
-        position: absolute;
-        left: 70px;
-        top: 12px;
-        font-weight: bold;
-      }
-
-      > p:nth-child(3) {
-        position: absolute;
-        left: 70px;
-        top: 28px;
-      }
-
-      > p:nth-child(4) {
-        position: absolute;
-        right: 12px;
-        bottom: 6px;
-        width:fit-content;
-      }
-
-      > p:nth-child(5) {
-        position: absolute;
-        right: 90px;
-        top: 6px;
-        width:fit-content;
-      }
+  .music-card {
+    p {
+      width: 35%;
+      font-size: 12px;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
-    .music-card-fav-icon {
+    > p:nth-child(2) {
       position: absolute;
-      right: 50px;
-      top: 2px;
+      left: 70px;
+      top: 12px;
+      font-weight: bold;
     }
 
-    .music-card-delete-icon {
+    > p:nth-child(3) {
       position: absolute;
-      right: 10px;
-      top: 3px;
+      left: 70px;
+      top: 28px;
+    }
+
+    > p:nth-child(4) {
+      position: absolute;
+      right: 12px;
+      bottom: 6px;
+      width:fit-content;
+    }
+
+    > p:nth-child(5) {
+      position: absolute;
+      right: 90px;
+      top: 6px;
+      width:fit-content;
     }
   }
 
-  @media (max-width: 425px) {
+  .music-card-fav-icon {
+    position: absolute;
+    right: 50px;
+    top: 2px;
+  }
 
-    .music-card {
+  .music-card-delete-icon {
+    position: absolute;
+    right: 10px;
+    top: 3px;
+  }
 
-      p {
-        font-size: 10px;
-      }
+  .search-card {
+    min-height: 30px;
+    border-radius: 50px;
 
-      > p:nth-child(2) {
-        position: absolute;
-        left: 60px;
-        top: 12px;
-      }
-
-      > p:nth-child(3) {
-        left: 60px;
-        top: 28px;
-      }
-
-      > p:nth-child(5) {
-        font-size: 11px;
-        top: 10px;
-      }
+    p{
+      font-size: 10px;
     }
 
-    .music-card-fav-icon {
-      top: 5px;
+    span {
+      gap: 10px;
+
+      p{
+        width: 140px;
+      }
+      
     }
 
-    .music-card-delete-icon {
-      top: 7px;
+  }
+
+  .search-card-img {
+    height: 22px;
+    width: 22px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 425px) {
+
+  .music-card {
+
+    p {
+      font-size: 10px;
+    }
+
+    > p:nth-child(2) {
+      position: absolute;
+      left: 60px;
+      top: 12px;
+    }
+
+    > p:nth-child(3) {
+      left: 60px;
+      top: 28px;
+    }
+
+    > p:nth-child(5) {
+      font-size: 11px;
+      top: 10px;
     }
   }
+
+  .music-card-fav-icon {
+    top: 5px;
+  }
+
+  .music-card-delete-icon {
+    top: 7px;
+  }
+}

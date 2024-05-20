@@ -2,6 +2,7 @@ import Localbase from "localbase";
 import EventEmitter from "./EventEmitter";
 
 const db = new Localbase("musicDB");
+db.config.debug = false;
 
 const loadTracksFromDB = async () => {
   const tracks = await db.collection("tracks").get();

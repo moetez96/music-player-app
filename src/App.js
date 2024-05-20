@@ -12,6 +12,7 @@ function App() {
   const [musicList, setMusicList] = useState([]);
   const [coverPicture, setCoverPicture] = useState(null);
   const [overView, setOverView] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     fetchAndSetTracks();  
@@ -66,15 +67,26 @@ function App() {
       setOverView(newState);
   };
 
+  async function searchSetTracks(text) {
+    setSearchText(text)
+    const tracks = await loadTracksFromDB();
+    const filteredTracks = tracks?.filter((elem) => elem.title.toLowerCase().includes(text.toLowerCase()));
+    setMusicList(filteredTracks);
+  }
+
+  const handleNavigationChange = async () => {
+    await searchSetTracks("");
+  }
+
   return (
     <Router>
       <>
-        <Header />
+        <Header searchSetTracks={searchSetTracks} searchText={searchText}/>
         <div className="main-screen-wrapper">
-          <Navigation />
+          <Navigation handleNavigationChange={handleNavigationChange}/>
           <Routes>
             <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>}/>
-            <Route path="/favorites" element={<FavoriteScreen coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>} />
+            <Route path="/favorites" element={<FavoriteScreen searchText={searchText} musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>} />
           </Routes>
         </div>
         <Footer overView={overView} updateOverView={updateOverView}/>

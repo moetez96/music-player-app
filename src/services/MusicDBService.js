@@ -194,13 +194,11 @@ const saveAudioCoverToDB = async (musicItem, coverPic) => {
 };
 
 const loadFavoriteTracksFromDB = async () => {
-  const favorites = (await db.collection("favoriteTracks").get()).map(
+  const favorites = (await db.collection("favoriteTracks").get())?.map(
     (fav) => fav.favoriteId
   );
-  const tracks = (await db.collection("tracks").get()).filter((track) =>
-    favorites.includes(track.id)
-  );
-  return tracks;
+
+  return favorites;
 };
 
 export {

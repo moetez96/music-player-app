@@ -4,7 +4,6 @@ import EventEmitter from "../../services/EventEmitter";
 import { loadFavoriteTracksFromDB } from "../../services/MusicDBService";
 
 function FavoriteScreen({
-  searchText,
   musicList,
   coverPicture,
   overView,
@@ -22,6 +21,12 @@ function FavoriteScreen({
     };
   }, []);
 
+  useEffect(() => {
+    if (musicList) {
+      loadTracksFromDB();
+    }
+  }, [musicList])
+
   const loadTracksFromDB = async () => {
     const favorites = await loadFavoriteTracksFromDB();
     const favoritesTracks = musicList?.filter((track) =>
@@ -32,7 +37,7 @@ function FavoriteScreen({
 
   return (
     <>
-      {musicList.length !== 0 ? (
+      {tracks.length !== 0 ? (
         <div className="upload-music-list-container">
           <MusicList
             musicList={tracks}

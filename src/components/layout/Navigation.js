@@ -9,7 +9,7 @@ function Navigation({handleNavigationChange}) {
   const isFavoritesRoute = location.pathname === "/favorites";
   
   const handleClick = () => {
-    handleNavigationChange();
+    handleNavigationChange("");
   }
 
   return (

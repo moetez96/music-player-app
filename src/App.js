@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
 import MainScreen from "./components/layout/MainScreen";
 import Navigation from "./components/layout/Navigation";
-import FavoriteScreen from "./components/layout/FavoriteScreen"; 
-import EventEmitter from './services/EventEmitter';
-import { getAudioCover, loadTracksFromDB } from './services/MusicDBService';
+import FavoriteScreen from "./components/layout/FavoriteScreen";
+import EventEmitter from "./services/EventEmitter";
+import { getAudioCover, loadTracksFromDB } from "./services/MusicDBService";
 
-function App() {
+function AppContent() {
   const [musicList, setMusicList] = useState([]);
   const [coverPicture, setCoverPicture] = useState(null);
   const [overView, setOverView] = useState(false);
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    fetchAndSetTracks();  
-    
+    fetchAndSetTracks();
+
     EventEmitter.on("tracksChanged", fetchAndSetTracks);
 
     return () => {
@@ -26,7 +26,7 @@ function App() {
 
   useEffect(() => {
     if (musicList.length !== 0) {
-      fetchCurrentTrackCoverPicture();  
+      fetchCurrentTrackCoverPicture();
     }
   }, [musicList]);
 
@@ -39,10 +39,10 @@ function App() {
       rgba(29, 33, 35, 0.79) 80%,
       rgba(29, 33, 35, 0.7) 100%),
       url(${coverPicture})`;
-      document.body.style.backgroundSize = 'cover';
-      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
     } else {
-      document.body.style.backgroundImage = 'none';
+      document.body.style.backgroundImage = "none";
     }
   }, [coverPicture]);
 
@@ -64,33 +64,56 @@ function App() {
   }
 
   const updateOverView = (newState) => {
-      setOverView(newState);
+    setOverView(newState);
   };
 
-  async function searchSetTracks(text) {
-    setSearchText(text)
-    const tracks = await loadTracksFromDB();
-    const filteredTracks = tracks?.filter((elem) => elem.title.toLowerCase().includes(text.toLowerCase()));
-    setMusicList(filteredTracks);
-  }
-
-  const handleNavigationChange = async () => {
-    await searchSetTracks("");
-  }
+  const handleNavigationChange = async (text) => {
+    setSearchText(text);
+  };
 
   return (
+    <>
+      <Header
+        searchText={searchText}
+        handleNavigationChange={handleNavigationChange}
+      />
+      <div className="main-screen-wrapper">
+        <Navigation handleNavigationChange={handleNavigationChange} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MainScreen
+                musicList={musicList}
+                coverPicture={coverPicture}
+                overView={overView}
+                updateOverView={updateOverView}
+              />
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <FavoriteScreen
+                searchText={searchText}
+                musicList={musicList}
+                coverPicture={coverPicture}
+                overView={overView}
+                updateOverView={updateOverView}
+              />
+            }
+          />
+        </Routes>
+      </div>
+      <Footer overView={overView} updateOverView={updateOverView} />
+    </>
+  );
+}
+
+function App() {
+  return (
     <Router>
-      <>
-        <Header musicList={musicList} searchSetTracks={searchSetTracks} searchText={searchText}/>
-        <div className="main-screen-wrapper">
-          <Navigation handleNavigationChange={handleNavigationChange}/>
-          <Routes>
-            <Route path="/" element={<MainScreen musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>}/>
-            <Route path="/favorites" element={<FavoriteScreen searchText={searchText} musicList={musicList} coverPicture={coverPicture} overView={overView} updateOverView={updateOverView}/>} />
-          </Routes>
-        </div>
-        <Footer overView={overView} updateOverView={updateOverView}/>
-      </>
+      <AppContent />
     </Router>
   );
 }

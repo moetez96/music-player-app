@@ -22,16 +22,10 @@ function FavoriteScreen({
     };
   }, []);
 
-  useEffect(() => {
-    loadTracksFromDB();
-  }, [searchText, musicList]);
-
   const loadTracksFromDB = async () => {
     const favorites = await loadFavoriteTracksFromDB();
-    const favoritesTracks = musicList?.filter(
-      (track) =>
-        favorites?.includes(track.id) &&
-        track?.title.toLowerCase().includes(searchText?.toLowerCase())
+    const favoritesTracks = musicList?.filter((track) =>
+      favorites?.includes(track.id)
     );
     setTracks(favoritesTracks);
   };

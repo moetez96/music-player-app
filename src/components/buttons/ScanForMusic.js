@@ -10,8 +10,6 @@ import { convertImageToBase64, getAudioBuffer } from "../../utils/Shared";
 import { toast } from "react-toastify";
 
 function ScanForMusic() {
-  const [scanResult, setScanResult] = useState({addedTracks: 0, rejectedTracks: 0});
-  console.log(scanResult)
   const handleFileChange = async (event) => {
     const fileList = event.target.files;
     const fileListArray = Array.from(fileList);
@@ -58,8 +56,8 @@ function ScanForMusic() {
                   }
                 }
 
-                await saveTrackToDBScan(track);
-                resolve(true);
+                const result = await saveTrackToDBScan(track);
+                resolve(result !== null);
               } catch (error) {
                 reject(false);
               }
@@ -72,15 +70,13 @@ function ScanForMusic() {
           console.error("Error processing file:", error);
           return false;
         }
-      } else {
-        return false;
       }
     };
 
     const processFiles = async () => {
-      var addedCount = 0;
-      var rejectedCount = 0;
-    
+      let addedCount = 0;
+      let rejectedCount = 0;
+
       for (const file of fileListArray) {
         const result = await processFile(file);
         if (result) {
@@ -90,39 +86,39 @@ function ScanForMusic() {
         }
       }
 
-      setScanResult({addedTracks: addedCount, rejectedTracks: rejectedCount});
+      return { addedCount, rejectedCount };
     };
 
     const promise = processFiles();
 
     toast.promise(
-      promise,
-      {
-        pending: 'Scanning and processing files...',
-      }
-    ).then(() => {
+        promise,
+        {
+          pending: 'Scanning and processing files...',
+        }
+    ).then(({ addedCount, rejectedCount }) => {
       console.log("Promise resolved!");
-      toast(`Scan complete! Added tracks: ${scanResult.addedTracks}, Rejected tracks: ${scanResult.rejectedTracks}`);
+      toast(`Scan complete! Added tracks: ${addedCount}, Rejected files: ${rejectedCount}`);
     });
   };
 
   return (
-    <>
-      <div>
-        <input
-          type="file"
-          id="scan-music"
-          directory=""
-          webkitdirectory=""
-          multiple
-          onChange={handleFileChange}
-        />
-      </div>
-      <label htmlFor="scan-music" className="upload-button">
-        <ScanForMusicIcon />
-        <span>Scan your device for music</span>
-      </label>
-    </>
+      <>
+        <div>
+          <input
+              type="file"
+              id="scan-music"
+              directory=""
+              webkitdirectory=""
+              multiple
+              onChange={handleFileChange}
+          />
+        </div>
+        <label htmlFor="scan-music" className="upload-button">
+          <ScanForMusicIcon />
+          <span>Scan your device for music</span>
+        </label>
+      </>
   );
 }
 

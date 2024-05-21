@@ -155,14 +155,15 @@ const saveTrackToDBScan = async (track) => {
       .get();
     if (existingTrack) {
       console.log("Duplicate track found in IndexedDB:", track);
-      return;
+      return null;
     }
 
     const urlId = await saveUrlToDB(track.urlId);
     const uniqueId = await generateUniqueId("tracks");
 
-    await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
+    const addedTrack = await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
     EventEmitter.emit("tracksChanged");
+    return addedTrack;
   } catch (error) {
     console.error("Error saving track to IndexedDB:", error);
   }

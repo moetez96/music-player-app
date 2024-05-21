@@ -3,7 +3,7 @@ import EventEmitter from "./EventEmitter";
 import { toast } from "react-toastify";
 
 const db = new Localbase("musicDB");
-db.config.debug = false;
+db.config.debug = true;
 
 const loadTracksFromDB = async () => {
   const tracks = await db.collection("tracks").get();
@@ -46,18 +46,9 @@ const refreshMusicList = async (isFavoritesRoute) => {
   const result = { tracks: [], track: null, audioUrl: null };
 
   try {
-    let listM = [];
-    if (isFavoritesRoute) {
-      listM = await getAllTracks();
-    }else{
-      const favorites = await loadFavoriteTracksFromDB();
-
-      listM = await getAllTracks();
-      listM = listM?.filter((track) =>
-          favorites?.includes(track.id)
-      );
-    }
+    let listM = await getAllTracks();
     const index = await listM.findIndex((item) => item.selected);
+
     if (index !== -1) {
       const existingTrack = await db
         .collection("audioUrls")
@@ -98,9 +89,11 @@ const handleFavoriteTrack = async (musicItem) => {
         .collection("favoriteTracks")
         .doc({ favoriteId: musicItem.id })
         .delete();
+      EventEmitter.emit("tracksChanged");
       return false;
     } else {
       await db.collection("favoriteTracks").add({ favoriteId: musicItem.id });
+      EventEmitter.emit("tracksChanged");
       return true;
     }
   } catch (error) {

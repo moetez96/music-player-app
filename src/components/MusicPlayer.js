@@ -16,7 +16,7 @@ import {
   selectTrack,
 } from "../services/MusicDBService";
 
-function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
+function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRoute, overView, updateOverView}) {
   const initialValue = 50;
   const [value, setValue] = useState(initialValue);
   const [currentTime, setCurrentTime] = useState(0);
@@ -29,6 +29,16 @@ function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
   const [firstMount, setFirstMount] = useState(true);
   const [allTracks, setAllTracks] = useState([]);
   const [image, setImage] = useState(placeHolderImage);
+
+  useEffect(() => {
+    setImage(coverPicture ? coverPicture : placeHolderImage);
+
+    if (isFavoritesRoute) {
+      setAllTracks(favoriteMusicList);
+    } else {
+      setAllTracks(musicList);
+    }
+  }, [coverPicture, favoriteMusicList, musicList]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-volume", value);
@@ -62,7 +72,6 @@ function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
           if (result.track) {
             setTrack(result.track);
 
-            fetchCoverPicture(result.track);
           }
           if (result.audioUrl) {
             audioRef.current.src = result.audioUrl;
@@ -88,17 +97,6 @@ function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
       EventEmitter.off("tracksChanged", updateMusicList);
     };
   }, []);
-
-  const fetchCoverPicture = async (track) => {
-    const coverPicture = await getAudioCover(track);
-    setImage(
-      coverPicture
-        ? coverPicture?.coverPicture
-          ? coverPicture?.coverPicture
-          : placeHolderImage
-        : placeHolderImage
-    );
-  };
 
   const handleInputChange = (event) => {
     setValue(event.target.value);
@@ -241,7 +239,7 @@ function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
             <span onClick={previousTrack}>
               <SkipBackIcon
                 isClickable={
-                  0 === allTracks?.findIndex((doc) => doc.id === track.id)
+                  0 === allTracks?.findIndex((doc) => doc?.id === track?.id)
                 }
               />
             </span>
@@ -252,7 +250,7 @@ function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
               <SkipFwdIcon
                 isClickable={
                   allTracks?.length - 1 ===
-                  allTracks?.findIndex((doc) => doc.id === track.id)
+                  allTracks?.findIndex((doc) => doc?.id === track?.id)
                 }
               />
             </span>

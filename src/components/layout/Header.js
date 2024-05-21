@@ -1,55 +1,40 @@
 import { useState } from "react";
-import {
-  loadFavoriteTracksFromDB,
-  loadTracksFromDB,
-} from "../../services/MusicDBService";
 import "../../styles/layout/header.scss";
 import SearchCard from "../cards/SearchCard";
 import SearchBar from "../forms/SearchBar";
 import Logo from "../icons/Logo";
 
-function Header({ isFavoritesRoute, searchText, handleNavigationChange }) {
-  const [musicList, setMusicList] = useState([]);
+function Header({ musicList, favoriteMusicList, isFavoritesRoute, searchText, handleNavigationChange }) {
+  const [tracks, setTracks] = useState([]);
 
   async function searchSetTracks(text) {
     handleNavigationChange(text);
-  
     try {
-      const tracks = await loadTracksFromDB();
-  
-      if (!Array.isArray(tracks)) {
-        console.error("tracks is not an array", tracks);
-        setMusicList([]);
-        return;
-      }
   
       if (isFavoritesRoute) {
-        const favorites = await loadFavoriteTracksFromDB();
-  
-        if (!Array.isArray(favorites)) {
-          console.error("favorites is not an array", favorites);
-          setMusicList([]);
+
+        if (!Array.isArray(favoriteMusicList)) {
+          console.error("favorites is not an array", favoriteMusicList);
+          setTracks([]);
           return;
         }
   
-        const favoritesTracks = tracks.filter(
+        const favoritesTracks = favoriteMusicList.filter(
           (track) =>
-            favorites.includes(track.id) &&
-            track.title.toLowerCase().includes(text.toLowerCase())
+              track.title.toLowerCase().includes(text.toLowerCase())
         );
-        setMusicList(favoritesTracks);
+        setTracks(favoritesTracks);
       } else {
-        const filteredTracks = tracks.filter((elem) =>
+        const filteredTracks = musicList.filter((elem) =>
           elem.title.toLowerCase().includes(text.toLowerCase())
         );
-        setMusicList(filteredTracks);
+        setTracks(filteredTracks);
       }
     } catch (error) {
       console.error("Error loading tracks", error);
-      setMusicList([]);
+      setTracks([]);
     }
   }
-  
 
   const handleClickSearch = () => {
     handleNavigationChange("")
@@ -63,10 +48,10 @@ function Header({ isFavoritesRoute, searchText, handleNavigationChange }) {
         <div className="search-result-wrapper">
           {musicList?.length !== 0 ? (
             <>
-              <p>Found: {musicList?.length}</p>
-              {musicList?.map((musicItem) => (
+              <p>Found: {tracks?.length}</p>
+              {tracks?.map((track) => (
                 <span onClick={handleClickSearch}>
-                  <SearchCard musicItem={musicItem} />
+                  <SearchCard musicItem={track} />
                 </span>
               ))}
             </>

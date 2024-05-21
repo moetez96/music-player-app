@@ -6,12 +6,13 @@ import MainScreen from "./components/layout/MainScreen";
 import Navigation from "./components/layout/Navigation";
 import FavoriteScreen from "./components/layout/FavoriteScreen";
 import EventEmitter from "./services/EventEmitter";
-import { getAudioCover, loadTracksFromDB } from "./services/MusicDBService";
+import {getAudioCover, loadFavoriteTracksFromDB, loadTracksFromDB} from "./services/MusicDBService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function AppContent() {
   const [musicList, setMusicList] = useState([]);
+  const [favoriteMusicList, setFavoriteMusicList] = useState([]);
   const [coverPicture, setCoverPicture] = useState(null);
   const [overView, setOverView] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -54,6 +55,11 @@ function AppContent() {
   async function fetchAndSetTracks() {
     const tracks = await loadTracksFromDB();
     setMusicList(tracks);
+    const favorites = await loadFavoriteTracksFromDB();
+    const favoriteTracks = tracks?.filter((track) =>
+        favorites?.includes(track.id)
+    );
+    setFavoriteMusicList(favoriteTracks);
   }
 
   async function fetchCurrentTrackCoverPicture() {
@@ -79,12 +85,14 @@ function AppContent() {
   return (
     <>
       <Header
+        musicList={musicList}
+        favoriteMusicList={favoriteMusicList}
         isFavoritesRoute={isFavoritesRoute}
         searchText={searchText}
         handleNavigationChange={handleNavigationChange}
       />
       <div className="main-screen-wrapper">
-        <Navigation handleNavigationChange={handleNavigationChange} />
+        <Navigation isFavoritesRoute={isFavoritesRoute} handleNavigationChange={handleNavigationChange} />
         <Routes>
           <Route
             path="/"
@@ -101,6 +109,7 @@ function AppContent() {
             path="/favorites"
             element={
               <FavoriteScreen
+                favoriteMusicList={favoriteMusicList}
                 searchText={searchText}
                 musicList={musicList}
                 coverPicture={coverPicture}
@@ -111,7 +120,7 @@ function AppContent() {
           />
         </Routes>
       </div>
-      <Footer isFavoritesRoute={isFavoritesRoute} overView={overView} updateOverView={updateOverView} />
+      <Footer favoriteMusicList={favoriteMusicList} musicList={musicList} coverPicture={coverPicture} isFavoritesRoute={isFavoritesRoute} overView={overView} updateOverView={updateOverView} />
     </>
   );
 }

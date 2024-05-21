@@ -9,6 +9,7 @@ import OverviewCard from "../cards/OverviewCard";
 function MusicList({ musicList, coverPicture, overView }) {
   const [currentTrack, setCurrentTrack] = useState(null);
   const location = useLocation();
+  const isFavoritesRoute = location.pathname === "/favorites";
 
   useEffect(() => {
     const index = musicList.findIndex((item) => item.selected);
@@ -17,7 +18,6 @@ function MusicList({ musicList, coverPicture, overView }) {
     }
   }, [musicList]);
 
-  const isFavoritesRoute = location.pathname === "/favorites";
 
   return (
     <div className="music-list-wrapper">

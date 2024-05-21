@@ -54,8 +54,8 @@
   &:hover {
     background-color: rgba(51, 55, 59, 0.75);
   }
-  
-  p{
+
+  p {
     width: 50px;
     overflow: hidden;
     white-space: nowrap;
@@ -69,10 +69,11 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    p{
+
+    p {
       width: 160px;
     }
-    
+
   }
 
   &.selected {
@@ -99,6 +100,54 @@
   overflow: hidden;
 }
 
+.music-playing-overview-container {
+  min-height: max-content;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.overview-title {
+font-size: 35px;
+font-weight: bold;
+color: #A4C7C6;
+margin-bottom: 2px;
+}
+
+.music-playing-overview-img {
+  height: 260px;
+  width: 250px;
+  border-radius: 40px;
+}
+
+.music-playing-overview-desc {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+
+  p {
+     margin-left: 5px;
+     color: #A4C7C6;
+     font-size: 16px;
+  }
+}
+
 
 @media (max-width: 1024px) {
   .music-card {
@@ -107,7 +156,7 @@
     span {
       gap: 20px;
     }
-  
+
     p {
       width: 16%;
       font-size: 13px;
@@ -117,6 +166,24 @@
   .music-card-img {
     height: 35px;
     width: 35px;
+  }
+
+  .music-playing-overview-img {
+    height: 200px;
+    width: 190px;
+  }
+
+  .music-playing-overview-desc {
+    gap: 6px;
+
+    p {
+      margin-left: 4px;
+      font-size: 14px;
+    }
+  }
+
+  .overview-title {
+    font-size: 24px;
   }
 }
 
@@ -145,6 +212,24 @@
     height: 33px;
     width: 33px;
   }
+
+  .music-playing-overview-img {
+    height: 190px;
+    width: 180px;
+  }
+
+  .music-playing-overview-desc {
+    gap: 6px;
+
+    p {
+      margin-left: 1px;
+      font-size: 12px;
+    }
+  }
+
+  .overview-title {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 580px) {
@@ -157,31 +242,31 @@
       white-space: nowrap;
     }
 
-    > p:nth-child(2) {
+    >p:nth-child(2) {
       position: absolute;
       left: 70px;
       top: 12px;
       font-weight: bold;
     }
 
-    > p:nth-child(3) {
+    >p:nth-child(3) {
       position: absolute;
       left: 70px;
       top: 28px;
     }
 
-    > p:nth-child(4) {
+    >p:nth-child(4) {
       position: absolute;
       right: 12px;
       bottom: 6px;
-      width:fit-content;
+      width: fit-content;
     }
 
-    > p:nth-child(5) {
+    >p:nth-child(5) {
       position: absolute;
       right: 90px;
       top: 6px;
-      width:fit-content;
+      width: fit-content;
     }
   }
 
@@ -201,17 +286,17 @@
     min-height: 30px;
     border-radius: 50px;
 
-    p{
+    p {
       font-size: 10px;
     }
 
     span {
       gap: 10px;
 
-      p{
+      p {
         width: 140px;
       }
-      
+
     }
 
   }
@@ -221,6 +306,57 @@
     width: 22px;
     border-radius: 2px;
     overflow: hidden;
+  }
+
+
+  .music-playing-overview-background {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    animation: fadeIn 0.5ss ease-in-out;
+  }
+
+  .music-playing-overview-container {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    animation: fadeIn 0.5ss ease-in-out;
+  }
+
+  .music-playing-overview-img {
+    position: absolute;
+    z-index: 1;
+    top: 30%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    height: 230px;
+    width: 220px;
+    border-radius: 40px;
+  }
+
+  .music-playing-overview-desc {
+    position: absolute;
+    z-index: 1;
+    top: 60%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    width: 180px;
   }
 }
 
@@ -232,18 +368,18 @@
       font-size: 10px;
     }
 
-    > p:nth-child(2) {
+    >p:nth-child(2) {
       position: absolute;
       left: 60px;
       top: 12px;
     }
 
-    > p:nth-child(3) {
+    >p:nth-child(3) {
       left: 60px;
       top: 28px;
     }
 
-    > p:nth-child(5) {
+    >p:nth-child(5) {
       font-size: 11px;
       top: 10px;
     }

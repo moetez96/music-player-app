@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import "../../styles/layout/music_list.scss";
 import placeHolderImage from "../../styles/assets/images/music_placeholder.jpg";
 
 function OverviewCard({ currentTrack, coverPicture, overView }) {

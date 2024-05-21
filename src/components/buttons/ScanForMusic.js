@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 import jsmediatags from "jsmediatags-web";
 import {
@@ -6,16 +7,18 @@ import {
   saveTrackToDBScan,
 } from "../../services/MusicDBService";
 import { convertImageToBase64, getAudioBuffer } from "../../utils/Shared";
+import { toast } from "react-toastify";
 
 function ScanForMusic() {
+  const [scanResult, setScanResult] = useState({addedTracks: 0, rejectedTracks: 0});
+  console.log(scanResult)
   const handleFileChange = async (event) => {
     const fileList = event.target.files;
     const fileListArray = Array.from(fileList);
 
-    for (const file of fileListArray) {
+    const processFile = async (file) => {
       if (file.type.startsWith("audio/")) {
         const audio = new Audio();
-
         try {
           const tag = await new Promise((resolve, reject) => {
             jsmediatags.read(file, {
@@ -40,10 +43,9 @@ function ScanForMusic() {
             composer: tag.tags["©wrt"]?.data || "Unknown",
             releaseDate: tag.tags.year || "Unknown",
             copyright: tag.tags["cprt"]?.data || "Unknown"
-
           };
 
-          await new Promise((resolve, reject) => {
+          return new Promise((resolve, reject) => {
             audio.addEventListener("loadedmetadata", async function () {
               try {
                 track.duration = audio.duration || 0;
@@ -57,9 +59,9 @@ function ScanForMusic() {
                 }
 
                 await saveTrackToDBScan(track);
-                resolve();
+                resolve(true);
               } catch (error) {
-                reject(error);
+                reject(false);
               }
             });
 
@@ -68,9 +70,40 @@ function ScanForMusic() {
           });
         } catch (error) {
           console.error("Error processing file:", error);
+          return false;
+        }
+      } else {
+        return false;
+      }
+    };
+
+    const processFiles = async () => {
+      var addedCount = 0;
+      var rejectedCount = 0;
+    
+      for (const file of fileListArray) {
+        const result = await processFile(file);
+        if (result) {
+          addedCount++;
+        } else {
+          rejectedCount++;
         }
       }
-    }
+
+      setScanResult({addedTracks: addedCount, rejectedTracks: rejectedCount});
+    };
+
+    const promise = processFiles();
+
+    toast.promise(
+      promise,
+      {
+        pending: 'Scanning and processing files...',
+      }
+    ).then(() => {
+      console.log("Promise resolved!");
+      toast(`Scan complete! Added tracks: ${scanResult.addedTracks}, Rejected tracks: ${scanResult.rejectedTracks}`);
+    });
   };
 
   return (

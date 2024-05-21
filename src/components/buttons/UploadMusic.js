@@ -7,6 +7,8 @@ import {
   saveAudioCoverToDB,
   saveTrackToDB,
 } from "../../services/MusicDBService";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function UploadMusic() {
   const handleFileChange = async (event) => {
@@ -78,9 +80,11 @@ function UploadMusic() {
         });
       } catch (error) {
         console.error("Error processing file:", error);
+        toast.error("An error occurred while processing the file.");
       }
     } else {
       console.error("Invalid file type. Please select an Audio file.");
+      toast.error("Invalid file type. Please select an Audio file.");
     }
   };
 

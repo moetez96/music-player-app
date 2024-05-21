@@ -1,5 +1,6 @@
 import Localbase from "localbase";
 import EventEmitter from "./EventEmitter";
+import { toast } from "react-toastify";
 
 const db = new Localbase("musicDB");
 db.config.debug = false;
@@ -140,6 +141,7 @@ const saveTrackToDB = async (track, arrayBuffer) => {
     const uniqueId = await generateUniqueId("tracks");
     await db.collection("tracks").add({ ...track, id: uniqueId, urlId: urlId });
     EventEmitter.emit("tracksChanged");
+    toast(`Track "${track.title}" have been added`)
   } catch (error) {
     console.error("Error saving track to IndexedDB:", error);
   }

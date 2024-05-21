@@ -48,11 +48,13 @@ function MusicCard({ musicItem }) {
     EventEmitter.emit("tracksChanged");
   };
 
-  const removeMusic = async () => {
+  const removeMusic = async (event) => {
+    event.stopPropagation();
     await deleteTrack(currentTrack);
   };
 
-  const handleFavorite = async () => {
+  const handleFavorite = async (event) => {
+    event.stopPropagation();
     handleFavoriteTrack(currentTrack)
       .then((result) => setIsFavorite(result))
       .catch((err) => console.log(err));

@@ -7,6 +7,8 @@ import Navigation from "./components/layout/Navigation";
 import FavoriteScreen from "./components/layout/FavoriteScreen";
 import EventEmitter from "./services/EventEmitter";
 import { getAudioCover, loadTracksFromDB } from "./services/MusicDBService";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function AppContent() {
   const [musicList, setMusicList] = useState([]);
@@ -114,6 +116,18 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </Router>
   );
 }

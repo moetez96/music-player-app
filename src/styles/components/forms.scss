@@ -3,6 +3,7 @@
     height: 96px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1%;
     padding-left: 22px;
 }
@@ -21,6 +22,19 @@ input[type] {
     &::placeholder {
         color: #FFFFFF;
         opacity: 1;
+    }
+}
+
+.close-search-bar {
+    cursor: pointer;
+    min-width: 24px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+        background-color: gray;
+        border-radius: 20px;
     }
 }
 

@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import placeHolderImage from "../../styles/assets/images/music_placeholder.jpg";
 
 function OverviewCard({ currentTrack, coverPicture, overView }) {
-
   useEffect(() => {
     if (coverPicture && currentTrack && overView) {
       const element = document.querySelector(
@@ -23,7 +22,6 @@ function OverviewCard({ currentTrack, coverPicture, overView }) {
     }
   }, [currentTrack, coverPicture, overView]);
 
-
   return (
     <>
       {overView && (
@@ -36,46 +34,62 @@ function OverviewCard({ currentTrack, coverPicture, overView }) {
               alt="overview-img"
             />
             <div className="music-playing-overview-desc">
-              {currentTrack?.title && currentTrack?.title !== "Unknown" ? (
-                <span className="overview-title">{currentTrack?.title}</span>
-              ) : (
-                <></>
-              )}
-              {currentTrack?.artist && currentTrack?.artist !== "Unknown" ? (
-                <p className="overview-artist">{currentTrack?.artist}</p>
-              ) : (
-                <></>
-              )}
-              {currentTrack?.album && currentTrack?.album !== "Unknown" ? (
-                <p className="overview-album">{currentTrack?.album}</p>
-              ) : (
-                <></>
-              )}
-              {currentTrack?.genre && currentTrack?.genre !== "Unknown" ? (
-                <p className="overview-genre">{currentTrack?.genre}</p>
-              ) : (
-                <></>
-              )}
-              {currentTrack?.composer &&
-              currentTrack?.composer !== "Unknown" ? (
-                <p className="overview-composer">{currentTrack?.composer}</p>
-              ) : (
-                <></>
-              )}
-              {currentTrack?.releaseDate &&
-              currentTrack?.releaseDate !== "Unknown" ? (
-                <p className="overview-releaseDate">
-                  {currentTrack?.releaseDate}
-                </p>
-              ) : (
-                <></>
-              )}
-              {currentTrack?.copyright &&
-              currentTrack?.copyright !== "Unknown" ? (
-                <p className="overview-copyright">{currentTrack?.copyright}</p>
-              ) : (
-                <></>
-              )}
+              <span className="overview-title">{currentTrack?.title}</span>
+
+              <p className="overview-artist">
+                <span>Artist: </span>
+                {currentTrack?.artist && currentTrack?.artist !== "Unknown" ? (
+                  <>{currentTrack?.artist}</>
+                ) : (
+                  <>--</>
+                )}
+              </p>
+              <p className="overview-album">
+                <span>Album: </span>
+                {currentTrack?.album && currentTrack?.album !== "Unknown" ? (
+                  <>{currentTrack?.album}</>
+                ) : (
+                  <>--</>
+                )}
+              </p>
+              <p className="overview-genre">
+                <span>Genre: </span>
+                {currentTrack?.genre && currentTrack?.genre !== "Unknown" ? (
+                  <>{currentTrack?.genre}</>
+                ) : (
+                  <>--</>
+                )}
+              </p>
+
+              <p className="overview-releaseDate">
+                <span>Release Date: </span>
+                {currentTrack?.releaseDate &&
+                currentTrack?.releaseDate !== "Unknown" ? (
+                  <>{currentTrack?.releaseDate}</>
+                ) : (
+                  <>--</>
+                )}
+              </p>
+
+              <p className="overview-copyright">
+                <span>Copyright: </span>
+                {currentTrack?.copyright &&
+                currentTrack?.copyright !== "Unknown" ? (
+                  <>{currentTrack?.copyright}</>
+                ) : (
+                  <>--</>
+                )}
+              </p>
+
+              <p className="overview-composer">
+                <span>Composer: </span>
+                {currentTrack?.composer &&
+                currentTrack?.composer !== "Unknown" ? (
+                  <>{currentTrack?.composer}</>
+                ) : (
+                  <>--</>
+                )}
+              </p>
             </div>
           </div>
         </>

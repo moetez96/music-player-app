@@ -42,11 +42,21 @@ const getAllTracks = async () => {
   }
 };
 
-const refreshMusicList = async () => {
+const refreshMusicList = async (isFavoritesRoute) => {
   const result = { tracks: [], track: null, audioUrl: null };
 
   try {
-    const listM = await db.collection("tracks").get();
+    let listM = [];
+    if (isFavoritesRoute) {
+      listM = await getAllTracks();
+    }else{
+      const favorites = await loadFavoriteTracksFromDB();
+
+      listM = await getAllTracks();
+      listM = listM?.filter((track) =>
+          favorites?.includes(track.id)
+      );
+    }
     const index = await listM.findIndex((item) => item.selected);
     if (index !== -1) {
       const existingTrack = await db

@@ -1,11 +1,11 @@
 import '../../styles/layout/footer.scss'
 import MusicPlayer from '../MusicPlayer';
 
-function Footer({overView, updateOverView}) {
+function Footer({isFavoritesRoute, overView, updateOverView}) {
     
     return (
         <div className='footer-wrapper'>
-            <MusicPlayer overView={overView} updateOverView={updateOverView}/>
+            <MusicPlayer isFavoritesRoute={isFavoritesRoute} overView={overView} updateOverView={updateOverView}/>
         </div>
     );
 }

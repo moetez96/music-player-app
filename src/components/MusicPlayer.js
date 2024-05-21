@@ -16,7 +16,7 @@ import {
   selectTrack,
 } from "../services/MusicDBService";
 
-function MusicPlayer({overView, updateOverView}) {
+function MusicPlayer({isFavoritesRoute, overView, updateOverView}) {
   const initialValue = 50;
   const [value, setValue] = useState(initialValue);
   const [currentTime, setCurrentTime] = useState(0);
@@ -56,7 +56,7 @@ function MusicPlayer({overView, updateOverView}) {
 
   useEffect(() => {
     const updateMusicList = () => {
-      refreshMusicList()
+      refreshMusicList(isFavoritesRoute)
         .then((result) => {
           setAllTracks(result.tracks);
           if (result.track) {

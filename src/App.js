@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes, useLocation} from "react-router-dom";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
 import MainScreen from "./components/layout/MainScreen";
@@ -15,6 +15,9 @@ function AppContent() {
   const [coverPicture, setCoverPicture] = useState(null);
   const [overView, setOverView] = useState(false);
   const [searchText, setSearchText] = useState("");
+
+  const location = useLocation();
+  const isFavoritesRoute = location.pathname === "/favorites";
 
   useEffect(() => {
     fetchAndSetTracks();
@@ -76,6 +79,7 @@ function AppContent() {
   return (
     <>
       <Header
+        isFavoritesRoute={isFavoritesRoute}
         searchText={searchText}
         handleNavigationChange={handleNavigationChange}
       />
@@ -107,7 +111,7 @@ function AppContent() {
           />
         </Routes>
       </div>
-      <Footer overView={overView} updateOverView={updateOverView} />
+      <Footer isFavoritesRoute={isFavoritesRoute} overView={overView} updateOverView={updateOverView} />
     </>
   );
 }

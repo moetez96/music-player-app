@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import ScanForMusicIcon from "../icons/ScanForMusicIcon";
 import jsmediatags from "jsmediatags-web";
 import {

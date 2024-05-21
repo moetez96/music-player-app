@@ -7,12 +7,9 @@ import "../../styles/layout/header.scss";
 import SearchCard from "../cards/SearchCard";
 import SearchBar from "../forms/SearchBar";
 import Logo from "../icons/Logo";
-import { useLocation } from "react-router-dom";
 
-function Header({ searchText, handleNavigationChange }) {
+function Header({ isFavoritesRoute, searchText, handleNavigationChange }) {
   const [musicList, setMusicList] = useState([]);
-  const location = useLocation();
-  const isFavoritesRoute = location.pathname === "/favorites";
 
   async function searchSetTracks(text) {
     handleNavigationChange(text);

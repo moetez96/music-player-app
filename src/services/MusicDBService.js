@@ -3,7 +3,7 @@ import EventEmitter from "./EventEmitter";
 import { toast } from "react-toastify";
 
 const db = new Localbase("musicDB");
-db.config.debug = true;
+db.config.debug = false;
 
 const loadTracksFromDB = async () => {
   const tracks = await db.collection("tracks").get();
@@ -17,16 +17,12 @@ const selectTrack = async (musicItem) => {
       .doc({ id: musicItem.id })
       .get();
     if (existingTrack !== null || existingTrack !== undefined) {
-      const tracks = await db.collection("tracks").get();
+      let tracks = await db.collection("tracks").get();
       for (let i = 0; i < tracks.length; i++) {
-        const track = tracks[i];
-        if (track.id === musicItem.id) {
-          track.selected = true;
-        } else {
-          track.selected = false;
-        }
-        await db.collection("tracks").doc({ id: track.id }).update(track);
+        tracks[i].selected = tracks[i].id === musicItem.id;
+        await db.collection("tracks").doc({ id: tracks[i].id }).update(tracks[i]);
       }
+      return tracks;
     }
   } catch (error) {
     console.error("Error updating track selection:", error);

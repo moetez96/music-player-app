@@ -58,6 +58,7 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
     }
 
     if (track && repeat != null && !firstMount && isPlaying) {
+      console.log("hello")
       setTimeout(() => {
         audioRef.current.play();
       }, 100);
@@ -68,22 +69,24 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
     const updateMusicList = () => {
       refreshMusicList(isFavoritesRoute)
         .then((result) => {
-          setAllTracks(result.tracks);
-          if (result.track) {
+
+          if ((result.track && !track) || result.track?.id !== track?.id) {
+            
             setTrack(result.track);
 
+            if (result.audioUrl) {
+              audioRef.current.src = result.audioUrl;
+              audioRef.current.addEventListener("loadedmetadata", () => {
+                setDuration(audioRef.current.duration);
+                if (firstMount) {
+                  setFirstMount(false);
+                }
+              });
+            } else {
+              console.error("Audio URL not found in LocalBase.");
+            }
           }
-          if (result.audioUrl) {
-            audioRef.current.src = result.audioUrl;
-            audioRef.current.addEventListener("loadedmetadata", () => {
-              setDuration(audioRef.current.duration);
-              if (firstMount) {
-                setFirstMount(false);
-              }
-            });
-          } else {
-            console.error("Audio URL not found in LocalBase.");
-          }
+
         })
         .catch((error) => {
           console.error("Error updating music list:", error);
@@ -145,6 +148,7 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
       console.log("No tracks found");
     } else {
       const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
+      console.log(allTracks);
       if (shuffle) {
         var randomIndex;
         do {

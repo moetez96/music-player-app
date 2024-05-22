@@ -1,11 +1,16 @@
 export function formatDuration(duration) {
-    if (!duration) {
-      return "--:--";
-    }
-  
-    var minutes = Math.floor(duration / 60);
-    var remainingSeconds = Math.floor(duration % 60);
-    return minutes + ":" + remainingSeconds;
+
+  if (typeof duration !== 'number' || duration < 0) {
+    return "--:--";
+  }
+
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
+
+  const formattedMinutes = String(minutes).padStart(2, '0');
+  const formattedSeconds = String(seconds).padStart(2, '0');
+
+  return `${formattedMinutes}:${formattedSeconds}`;
 }
 
 export async function convertImageToBase64(picture) {

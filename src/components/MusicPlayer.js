@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import placeHolderImage from "../styles/assets/images/music_placeholder.jpg";
 import "../styles/components/musicPlayer.scss";
 import VolUpIcon from "./icons/VolUpIcon";
@@ -10,13 +10,10 @@ import { formatDuration } from "../utils/Shared";
 import RepeatIcon from "./icons/RepeatIcon";
 import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
-import {
-  getAudioCover,
-  refreshMusicList,
-  selectTrack,
-} from "../services/MusicDBService";
+import { fetchAudioUrl, selectTrack } from "../services/MusicDBService";
+import { toast } from "react-toastify";
 
-function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRoute, overView, updateOverView}) {
+function MusicPlayer({ favoriteMusicList, musicList, coverPicture, isFavoritesRoute, overView, updateOverView }) {
   const initialValue = 50;
   const [value, setValue] = useState(initialValue);
   const [currentTime, setCurrentTime] = useState(0);
@@ -38,95 +35,86 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
     } else {
       setAllTracks(musicList);
     }
-  }, [coverPicture, favoriteMusicList, musicList]);
+  }, [coverPicture, favoriteMusicList, musicList, isFavoritesRoute]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--slider-value-volume", value);
-    audioRef.current.volume = value / 100;
+    if (audioRef.current) {
+      audioRef.current.volume = value / 100;
+    }
   }, [value]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty(
-      "--slider-value-duration",
-      currentTime
-    );
+    document.documentElement.style.setProperty("--slider-value-duration", currentTime);
   }, [currentTime]);
 
   useEffect(() => {
-    if (!repeat) {
-      setIsPlaying(false);
-    }
-
-    if (track && repeat != null && !firstMount && isPlaying) {
-      console.log("hello")
-      setTimeout(() => {
-        audioRef.current.play();
-      }, 100);
-    }
-  }, [track, firstMount]);
-
-  useEffect(() => {
-    const updateMusicList = () => {
-      refreshMusicList(isFavoritesRoute)
-        .then((result) => {
-
-          if ((result.track && !track) || result.track?.id !== track?.id) {
-            
-            setTrack(result.track);
-
-            if (result.audioUrl) {
-              audioRef.current.src = result.audioUrl;
+    const updateTrack = async () => {
+      if (allTracks.length > 0) {
+        const selectedTrack = allTracks.find((track) => track.selected);
+        if (selectedTrack && selectedTrack !== track) {
+          setTrack(selectedTrack);
+          try {
+            const audioUrl = await fetchAudioUrl(selectedTrack.urlId);
+            if (audioUrl) {
+              audioRef.current.src = audioUrl;
               audioRef.current.addEventListener("loadedmetadata", () => {
                 setDuration(audioRef.current.duration);
                 if (firstMount) {
                   setFirstMount(false);
                 }
+                if (!repeat) {
+                  setIsPlaying(false);
+                }
+                if (track && repeat != null && !firstMount && isPlaying) {
+                  setTimeout(() => {
+                    setIsPlaying(true);
+                    audioRef.current.play();
+                  }, 100);
+                }
               });
             } else {
-              console.error("Audio URL not found in LocalBase.");
+              toast.error("Audio URL not found.");
             }
+          } catch (error) {
+            console.error(error);
+            toast.error("The track audio is corrupted.");
           }
-
-        })
-        .catch((error) => {
-          console.error("Error updating music list:", error);
-        });
+        }
+      }
     };
 
-    updateMusicList();
-    EventEmitter.on("tracksChanged", updateMusicList);
+    updateTrack();
+  }, [allTracks]);
 
-    return () => {
-      EventEmitter.off("tracksChanged", updateMusicList);
-    };
+  const handleInputChange = useCallback((event) => {
+    setValue(event.target.value);
   }, []);
 
-  const handleInputChange = (event) => {
-    setValue(event.target.value);
-  };
+  const changeVolume = useCallback(() => {
+    setValue((prevValue) => {
+      if (prevValue < 20 && prevValue !== 0) {
+        return 0;
+      } else if (prevValue === 0) {
+        return 100;
+      } else {
+        return prevValue / 2;
+      }
+    });
+  }, []);
 
-  const changeVolume = () => {
-    if (value < 20 && value !== 0) {
-      setValue(0);
-    } else if (value === 0) {
-      setValue(100);
-    } else {
-      setValue(value / 2);
-    }
-  };
-
-  const playAudio = async () => {
+  const playAudio = useCallback(async () => {
     if (isPlaying) {
       await audioRef.current.pause();
     } else {
       await audioRef.current.play();
     }
-    setIsPlaying(!isPlaying);
-  };
+    setIsPlaying((prevIsPlaying) => !prevIsPlaying);
+  }, [isPlaying]);
 
-  const handleRepeat = () => {
-    setRepeat((prevState) => {
-      switch (prevState) {
+  const handleRepeat = useCallback(() => {
+    setRepeat((prevRepeat) => {
+      switch (prevRepeat) {
         case null:
           return "One";
         case "One":
@@ -137,161 +125,144 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
           return null;
       }
     });
-  };
+  }, []);
 
-  const handleShuffle = () => {
-    setShuffle(!shuffle);
-  };
+  const handleShuffle = useCallback(() => {
+    setShuffle((prevShuffle) => !prevShuffle);
+  }, []);
 
-  const nextTrack = async () => {
-    if (allTracks?.empty) {
+  const nextTrack = useCallback(async () => {
+    if (!allTracks || allTracks.length === 0) {
       console.log("No tracks found");
-    } else {
-      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
-      console.log(allTracks);
-      if (shuffle) {
-        var randomIndex;
-        do {
-          randomIndex = Math.floor(Math.random() * allTracks?.length);
-        } while (randomIndex === trackIndex);
+      return;
+    }
 
-        await selectTrack(allTracks[randomIndex]);
-      } else if (trackIndex !== -1 && trackIndex < allTracks?.length) {
-        await selectTrack(allTracks[trackIndex + 1]);
-      } else {
-        setIsPlaying(false);
-        console.log("No tracks found");
-      }
+    const trackIndex = allTracks.findIndex((doc) => doc.id === track.id);
+
+    if (shuffle) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allTracks.length);
+      } while (randomIndex === trackIndex);
+
+      await selectTrack(allTracks[randomIndex]);
       EventEmitter.emit("tracksChanged");
-    }
-  };
-
-  const previousTrack = async () => {
-    if (allTracks?.empty) {
-      console.log("No tracks found");
+    } else if (trackIndex !== -1 && trackIndex < allTracks.length - 1) {
+      await selectTrack(allTracks[trackIndex + 1]);
+      EventEmitter.emit("tracksChanged");
     } else {
-      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
-      if (trackIndex !== -1 && trackIndex > 0) {
-        await selectTrack(allTracks[trackIndex - 1]);
-        EventEmitter.emit("tracksChanged");
-      } else {
-        setIsPlaying(false);
-        console.log("No tracks found");
-      }
+      setIsPlaying(false);
+      console.log("Reached the end of the playlist");
     }
-  };
+    }, [allTracks, shuffle, track]);
 
-  const handleSliderChange = (event) => {
+  const previousTrack = useCallback(async () => {
+    if (!allTracks || allTracks.length === 0) {
+      console.log("No tracks found");
+      return;
+    }
+
+    const trackIndex = allTracks.findIndex((doc) => doc.id === track.id);
+    if (trackIndex !== -1 && trackIndex > 0) {
+      await selectTrack(allTracks[trackIndex - 1]);
+      EventEmitter.emit("tracksChanged");
+    } else {
+      setIsPlaying(false);
+      console.log("No tracks found");
+    }
+  }, [allTracks, track]);
+
+  const handleSliderChange = useCallback((event) => {
     audioRef.current.currentTime = (event.target.value / 100) * duration;
     setCurrentTime(event.target.value);
-    document.documentElement.style.setProperty(
-      "--slider-value-duration",
-      currentTime
-    );
-  };
+    document.documentElement.style.setProperty("--slider-value-duration", currentTime);
+  }, [duration, currentTime]);
 
-  const updateTime = async () => {
+  const updateTime = useCallback(async () => {
     setCurrentTime((audioRef.current.currentTime / duration) * 100);
 
-    if (audioRef.current.currentTime === duration) {
+    if (audioRef.current.ended) {
       if (repeat === "One") {
-        setTrack(track);
-        EventEmitter.emit("tracksChanged");
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
       } else if (repeat === "All") {
-        nextTrack();
-      } else if (repeat === null) {
+        await nextTrack();
+      } else {
         setIsPlaying(false);
       }
     }
-  };
+  }, [duration, nextTrack, repeat]);
 
-  const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
-  const handleOverViewClick = () => {
-    updateOverView(!overView);
-  };
+  const handleOverViewClick = useCallback(() => {
+    updateOverView((prevOverView) => !prevOverView);
+  }, [updateOverView]);
 
   return (
-    <div className="player-wrapper">
-      <div>
-        <audio
-          ref={audioRef}
-          controls
-          onTimeUpdate={updateTime}
-          style={{ display: "none" }}
-        />
-      </div>
-      <div className="music-playing-container">
-        <div className="music-playing-image-container" onClick={handleOverViewClick}>
-          <div className="music-playing-image">
-            <img src={image} alt="cover" />
-          </div>
-          <div className="music-playing-shdes">
-            <p className="music-playing-title">{track ? track.title : ""}</p>
-            <p className="music-playing-artist">{track ? track.artist : ""}</p>
-          </div>
+      <div className="player-wrapper">
+        <div>
+          <audio ref={audioRef} controls onTimeUpdate={updateTime} style={{ display: "none" }} />
         </div>
-        <div className="music-playing-options">
-          <div className="music-playing-buttons">
+        <div className="music-playing-container">
+          <div className="music-playing-image-container" onClick={handleOverViewClick}>
+            <div className="music-playing-image">
+              <img src={image} alt="cover" />
+            </div>
+            <div className="music-playing-shdes">
+              <p className="music-playing-title">{track ? track.title : ""}</p>
+              <p className="music-playing-artist">{track ? track.artist : ""}</p>
+            </div>
+          </div>
+          <div className="music-playing-options">
+            <div className="music-playing-buttons">
             <span onClick={handleShuffle}>
               <PlayRandomIcon isShuffle={shuffle} />
             </span>
-            <span onClick={previousTrack}>
+              <span onClick={previousTrack}>
               <SkipBackIcon
-                isClickable={
-                  0 === allTracks?.findIndex((doc) => doc?.id === track?.id)
-                }
+                  isClickable={0 === allTracks?.findIndex((doc) => doc?.id === track?.id)}
               />
             </span>
-            <span onClick={playAudio}>
+              <span onClick={playAudio}>
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </span>
-            <span onClick={nextTrack}>
+              <span onClick={nextTrack}>
               <SkipFwdIcon
-                isClickable={
-                  allTracks?.length - 1 ===
-                  allTracks?.findIndex((doc) => doc?.id === track?.id)
-                }
+                  isClickable={allTracks?.length - 1 === allTracks?.findIndex((doc) => doc?.id === track?.id)}
               />
             </span>
-            <span onClick={handleRepeat}>
+              <span onClick={handleRepeat}>
               <RepeatIcon repeat={repeat} />
             </span>
-          </div>
-          <div className="music-playing-slider">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={currentTime ? currentTime : 0}
-              onChange={handleSliderChange}
-              className="music-playing-sliders"
-            />
-            <div className="music-playing-timer">
-              {formatTime(((currentTime ? currentTime : 0) * duration) / 100)} -{" "}
-              {formatDuration(duration)}
+            </div>
+            <div className="music-playing-slider">
+              <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={currentTime ? currentTime : 0}
+                  onChange={handleSliderChange}
+                  className="music-playing-sliders"
+              />
+              <div className="music-playing-timer">
+                {formatDuration(((currentTime ? currentTime : 0) * duration) / 100)} - {formatDuration(duration)}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="music-playing-volume">
+          <div className="music-playing-volume">
           <span onClick={changeVolume}>
             <VolUpIcon value={value} />
           </span>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={value}
-            onChange={handleInputChange}
-            className="music-volume-sliders"
-          />
+            <input
+                type="range"
+                min={0}
+                max={100}
+                value={value}
+                onChange={handleInputChange}
+                className="music-volume-sliders"
+            />
+          </div>
         </div>
       </div>
-    </div>
   );
 }
 

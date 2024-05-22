@@ -52,7 +52,7 @@ function MusicPlayer({ favoriteMusicList, musicList, coverPicture, isFavoritesRo
     const updateTrack = async () => {
       if (allTracks.length > 0) {
         const selectedTrack = allTracks.find((track) => track.selected);
-        if (selectedTrack && selectedTrack !== track) {
+        if (selectedTrack && selectedTrack?.id !== track?.id) {
           setTrack(selectedTrack);
           try {
             const audioUrl = await fetchAudioUrl(selectedTrack.urlId);

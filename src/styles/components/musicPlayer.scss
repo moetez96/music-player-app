@@ -1,12 +1,4 @@
-@mixin range-track-color-volume {
-    $percentage: calc((100% / 100) * var(--slider-value-volume));
-    background: linear-gradient(to right, #FACD66 0%, #FACD66 #{$percentage}, rgba(255, 255, 255, 0.1) #{$percentage}, rgba(255, 255, 255, 0.1) 100%);
-}
-
-@mixin range-track-color-duration {
-    $percentage: calc((100% / 100) * var(--slider-value-duration));
-    background: linear-gradient(to right, #FACD66 0%, #FACD66 #{$percentage}, rgba(255, 255, 255, 0.1) #{$percentage}, rgba(255, 255, 255, 0.1) 100%);
-}
+@import '../utilities/mixins';
 
 .player-wrapper {
     height: 100%;
@@ -94,6 +86,10 @@
     display: flex;
     justify-content: flex-end;
     gap: 4px;
+
+    span {
+        cursor: pointer;
+    }
 }
 
 .music-playing-sliders {

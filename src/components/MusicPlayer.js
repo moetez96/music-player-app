@@ -249,9 +249,9 @@ function MusicPlayer({ favoriteMusicList, musicList, coverPicture, isFavoritesRo
             </div>
           </div>
           <div className="music-playing-volume">
-          <span onClick={changeVolume}>
-            <VolUpIcon value={value} />
-          </span>
+            <span onClick={changeVolume}>
+              <VolUpIcon value={value} />
+            </span>
             <input
                 type="range"
                 min={0}

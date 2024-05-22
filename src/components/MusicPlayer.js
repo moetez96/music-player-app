@@ -193,12 +193,6 @@ function MusicPlayer({ favoriteMusicList, musicList, coverPicture, isFavoritesRo
     }
   }, [duration, nextTrack, repeat]);
 
-  const formatTime = useCallback((timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  }, []);
-
   const handleOverViewClick = useCallback(() => {
     updateOverView((prevOverView) => !prevOverView);
   }, [updateOverView]);
@@ -250,7 +244,7 @@ function MusicPlayer({ favoriteMusicList, musicList, coverPicture, isFavoritesRo
                   className="music-playing-sliders"
               />
               <div className="music-playing-timer">
-                {formatTime(((currentTime ? currentTime : 0) * duration) / 100)} - {formatDuration(duration)}
+                {formatDuration(((currentTime ? currentTime : 0) * duration) / 100)} - {formatDuration(duration)}
               </div>
             </div>
           </div>

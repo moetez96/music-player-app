@@ -38,32 +38,6 @@ const getAllTracks = async () => {
   }
 };
 
-const refreshMusicList = async (isFavoritesRoute) => {
-  const result = { tracks: [], track: null, audioUrl: null };
-
-  try {
-    let listM = await getAllTracks();
-    const index = await listM.findIndex((item) => item.selected);
-
-    if (index !== -1) {
-      const existingTrack = await db
-        .collection("audioUrls")
-        .doc({ id: listM[index].urlId })
-        .get();
-      result.track = listM[index];
-      const audioUrl = URL.createObjectURL(
-        new Blob([existingTrack.arrayBuffer])
-      );
-      result.audioUrl = audioUrl;
-      result.tracks = listM;
-    }
-  } catch (error) {
-    console.error("Error fetching music list from LocalBase:", error);
-  }
-
-  return result;
-};
-
 const deleteTrack = async (musicItem) => {
   try {
     await db.collection("tracks").doc({ id: musicItem.id }).delete();
@@ -219,7 +193,6 @@ export {
   loadTracksFromDB,
   selectTrack,
   getAllTracks,
-  refreshMusicList,
   deleteTrack,
   handleFavoriteTrack,
   getFavorite,

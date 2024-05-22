@@ -12,7 +12,6 @@ import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
 import {
   fetchAudioUrl,
-  refreshMusicList,
   selectTrack,
 } from "../services/MusicDBService";
 import {toast} from "react-toastify";
@@ -69,17 +68,16 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
               }
 
               if (!repeat) {
-                console.log("Hi")
                 setIsPlaying(false);
               }
-
               if (track && repeat != null && !firstMount && isPlaying) {
-                console.log("Hello")
                 setTimeout(() => {
+                  setIsPlaying(true);
                   audioRef.current.play();
                 }, 100);
               }
             });
+
           } else {
             console.error("Audio URL not found.");
             toast.error("The track audio is corrupted.");
@@ -134,27 +132,30 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
   };
 
   const nextTrack = async () => {
-    if (allTracks?.empty) {
+    if (!allTracks || allTracks.length === 0) {
       console.log("No tracks found");
-    } else {
-      const trackIndex = allTracks?.findIndex((doc) => doc.id === track.id);
-      console.log(allTracks);
-      if (shuffle) {
-        var randomIndex;
-        do {
-          randomIndex = Math.floor(Math.random() * allTracks?.length);
-        } while (randomIndex === trackIndex);
-
-        await selectTrack(allTracks[randomIndex]);
-      } else if (trackIndex !== -1 && trackIndex < allTracks?.length) {
-        await selectTrack(allTracks[trackIndex + 1]);
-      } else {
-        setIsPlaying(false);
-        console.log("No tracks found");
-      }
-      EventEmitter.emit("tracksChanged");
+      return;
     }
+
+    const trackIndex = allTracks.findIndex((doc) => doc.id === track.id);
+
+    if (shuffle) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allTracks.length);
+      } while (randomIndex === trackIndex);
+
+      await selectTrack(allTracks[randomIndex]);
+    } else if (trackIndex !== -1 && trackIndex < allTracks.length - 1) {
+      await selectTrack(allTracks[trackIndex + 1]);
+    } else {
+      setIsPlaying(false);
+      console.log("Reached the end of the playlist");
+    }
+
+    EventEmitter.emit("tracksChanged");
   };
+
 
   const previousTrack = async () => {
     if (allTracks?.empty) {
@@ -185,15 +186,21 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
 
     if (audioRef.current.currentTime === duration) {
       if (repeat === "One") {
-        setTrack(track);
-        EventEmitter.emit("tracksChanged");
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
       } else if (repeat === "All") {
-        nextTrack();
-      } else if (repeat === null) {
-        setIsPlaying(false);
+        await nextTrack();
+      } else {
+        const trackIndex = allTracks.findIndex((doc) => doc.id === track.id);
+        if (trackIndex === allTracks.length - 1) {
+          setIsPlaying(false);
+        } else {
+          await nextTrack();
+        }
       }
     }
   };
+
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);

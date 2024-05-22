@@ -204,6 +204,17 @@ const loadFavoriteTracksFromDB = async () => {
   return favorites;
 };
 
+async function fetchAudioUrl(urlId) {
+  try {
+    const existingTrack = await db.collection("audioUrls").doc({ id: urlId }).get();
+    const audioUrl = URL.createObjectURL(new Blob([existingTrack.arrayBuffer]));
+    return audioUrl;
+  } catch (error) {
+    console.error("Error fetching audio URL:", error);
+    return null;
+  }
+}
+
 export {
   loadTracksFromDB,
   selectTrack,
@@ -219,4 +230,5 @@ export {
   getAudioCover,
   saveAudioCoverToDB,
   loadFavoriteTracksFromDB,
+  fetchAudioUrl
 };

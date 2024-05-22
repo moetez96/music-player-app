@@ -11,10 +11,11 @@ import RepeatIcon from "./icons/RepeatIcon";
 import PlayRandomIcon from "./icons/PlayRandomIcon";
 import PauseIcon from "./icons/PauseIcon";
 import {
-  getAudioCover,
+  fetchAudioUrl,
   refreshMusicList,
   selectTrack,
 } from "../services/MusicDBService";
+import {toast} from "react-toastify";
 
 function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRoute, overView, updateOverView}) {
   const initialValue = 50;
@@ -53,53 +54,42 @@ function MusicPlayer({favoriteMusicList, musicList, coverPicture, isFavoritesRou
   }, [currentTime]);
 
   useEffect(() => {
-    if (!repeat) {
-      setIsPlaying(false);
-    }
+    const updateTrack = async () => {
+      if (allTracks.length > 0) {
+        const selectedTrack = allTracks.find((track) => track.selected);
+        if (selectedTrack && selectedTrack !== track) {
+          setTrack(selectedTrack);
+          const audioUrl = await fetchAudioUrl(selectedTrack.urlId);
+          if (audioUrl) {
+            audioRef.current.src = audioUrl;
+            audioRef.current.addEventListener("loadedmetadata", () => {
+              setDuration(audioRef.current.duration);
+              if (firstMount) {
+                setFirstMount(false);
+              }
 
-    if (track && repeat != null && !firstMount && isPlaying) {
-      console.log("hello")
-      setTimeout(() => {
-        audioRef.current.play();
-      }, 100);
-    }
-  }, [track, firstMount]);
+              if (!repeat) {
+                console.log("Hi")
+                setIsPlaying(false);
+              }
 
-  useEffect(() => {
-    const updateMusicList = () => {
-      refreshMusicList(isFavoritesRoute)
-        .then((result) => {
-
-          if ((result.track && !track) || result.track?.id !== track?.id) {
-            
-            setTrack(result.track);
-
-            if (result.audioUrl) {
-              audioRef.current.src = result.audioUrl;
-              audioRef.current.addEventListener("loadedmetadata", () => {
-                setDuration(audioRef.current.duration);
-                if (firstMount) {
-                  setFirstMount(false);
-                }
-              });
-            } else {
-              console.error("Audio URL not found in LocalBase.");
-            }
+              if (track && repeat != null && !firstMount && isPlaying) {
+                console.log("Hello")
+                setTimeout(() => {
+                  audioRef.current.play();
+                }, 100);
+              }
+            });
+          } else {
+            console.error("Audio URL not found.");
+            toast.error("The track audio is corrupted.");
           }
-
-        })
-        .catch((error) => {
-          console.error("Error updating music list:", error);
-        });
+        }
+      }
     };
 
-    updateMusicList();
-    EventEmitter.on("tracksChanged", updateMusicList);
-
-    return () => {
-      EventEmitter.off("tracksChanged", updateMusicList);
-    };
-  }, []);
+    updateTrack();
+  }, [allTracks]);
 
   const handleInputChange = (event) => {
     setValue(event.target.value);

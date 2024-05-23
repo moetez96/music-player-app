@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+ # Music Player App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive music player app built with React and Sass, utilizing IndexedDB (via LocalBase) for local storage. This app allows users to select and play audio files from their device. 
 
-## Available Scripts
+Users can scan specific folders for audio files, collect metadata, and manage their music library with ease.
 
-In the project directory, you can run:
+## Live Demo
+Check out the live demo of the app here: 
+https://music-player-app-blond.vercel.app/
 
-### `npm start`
+## Features
+- **File Selection & Scanning:** Users can select individual audio files from their device or scan entire folders (including subfolders) for audio files.
+- **Metadata Collection:** Automatically collects and displays metadata for each audio file.
+- **Favorites:** Users can mark tracks as favorites for easy access.
+- **Playback Modes:** Includes repeat, play all, and shuffle modes.
+- **Search:** Users can search for audio files within their library.
+- **Volume Control:** Users can adjust the playback volume.
+- **Music Slider:** Users can control the playback progress with a slider.
+- **Track Navigation:** Allows jumping to the next or previous track if available.
+- **Responsive Design:** Optimized for both desktop and mobile devices.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Usage
+- **Select Audio Files:** Use the file selection feature to choose audio files from your device.
+- **Scan Folder:** Scan a specific folder (and its subfolders) for audio files to add them to your library.
+- **View Metadata:** View the collected metadata for each audio file in your library.
+- **Favorite Tracks:** Mark tracks as favorites for quick access.
+- **Playback Controls:** Use the playback controls to manage your listening experience (repeat, shuffle, play all, volume control, etc.).
+- **Search:** Search for specific tracks in your library.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+Follow these instructions to set up and run the project locally for development and testing purposes.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+-> git clone https://github.com/moetez96/RestAPI-Exceptions.git
+-> cd RestAPI-Exceptions
+-> mvn clean install
+-> mvn spring-boot:run
+```
 
-### `npm run build`
+### Prerequisites
+- Node JS
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Technologies Used
+- **React:** JavaScript library for building user interfaces.
+- **Sass:** CSS pre-processor.
+- **IndexedDB (LocalBase):** Client-side storage solution for storing and managing audio files metadata.    
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Follow these instructions to set up and run the project locally for development and testing purposes.
 
-### `npm run eject`
+```
+-> git clone https://github.com/moetez96/music-player-app.git
+-> cd music-player-app
+-> npm install
+-> npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Prerequisites
+- Node JS
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Thank you for using my Music Player App! Enjoy your music experience.

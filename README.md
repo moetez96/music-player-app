@@ -27,20 +27,6 @@ https://music-player-app-blond.vercel.app/
 - **Playback Controls:** Use the playback controls to manage your listening experience (repeat, shuffle, play all, volume control, etc.).
 - **Search:** Search for specific tracks in your library.
 
-## Getting Started
-
-Follow these instructions to set up and run the project locally for development and testing purposes.
-
-```
--> git clone https://github.com/moetez96/RestAPI-Exceptions.git
--> cd RestAPI-Exceptions
--> mvn clean install
--> mvn spring-boot:run
-```
-
-### Prerequisites
-- Node JS
-
 ## Technologies Used
 - **React:** JavaScript library for building user interfaces.
 - **Sass:** CSS pre-processor.

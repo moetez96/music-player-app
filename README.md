@@ -18,7 +18,7 @@ Check out the live demo of the app here:
 - **🎚️ Music Slider:** Users can control the playback progress with a slider.
 - **⏮️⏭️ Track Navigation:** Allows jumping to the next or previous track if available.
 - **📱 Responsive Design:** Optimized for both desktop and mobile devices.
-
+  
 ## 🚀 Usage
 - **📂 Select Audio Files:** Use the file selection feature to choose audio files from your device.
 - **🗂️ Scan Folder:** Scan a specific folder (and its subfolders) for audio files to add them to your library.
